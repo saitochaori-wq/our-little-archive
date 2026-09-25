@@ -589,6 +589,76 @@ object-position: center top;
         font-size: 32px;
       }
     }
+    /* =========================
+Love Notification
+========================= */
+
+.love-notification {
+position: fixed;
+top: 12px;
+left: 50%;
+z-index: 99999;
+
+width: calc(100% - 24px);
+max-width: 380px;
+
+transform: translate(-50%, -120px);
+
+background: rgba(255, 253, 251, 0.97);
+color: #4a3b3b;
+
+border: 1px solid rgba(239, 182, 202, 0.55);
+border-radius: 18px;
+
+padding: 14px 18px;
+
+box-shadow:
+0 8px 28px rgba(80, 50, 60, 0.18),
+0 2px 8px rgba(80, 50, 60, 0.08);
+
+pointer-events: none;
+
+animation:
+loveNotificationIn 0.45s cubic-bezier(.22,.61,.36,1) forwards,
+loveNotificationOut 0.45s ease-in 7.55s forwards;
+}
+
+.love-notification-inner {
+text-align: center;
+font-family: Georgia, serif;
+font-size: 14px;
+line-height: 1.5;
+color: #8d5369;
+}
+
+@keyframes loveNotificationIn {
+0% {
+opacity: 0;
+transform: translate(-50%, -120px) scale(0.92);
+}
+
+70% {
+transform: translate(-50%, 5px) scale(1.02);
+}
+
+100% {
+opacity: 1;
+transform: translate(-50%, 0) scale(1);
+}
+}
+
+@keyframes loveNotificationOut {
+0% {
+opacity: 1;
+transform: translate(-50%, 0) scale(1);
+}
+
+100% {
+opacity: 0;
+transform: translate(-50%, -120px) scale(0.96);
+}
+}
+
   </style>
 </head>
 
