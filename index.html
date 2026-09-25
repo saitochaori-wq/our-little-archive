@@ -644,6 +644,8 @@ transform: translate(-50%, 0) scale(1);
 }
 }
 
+</style>
+
 </head>
 
 <body>
@@ -884,18 +886,21 @@ transform: translate(-50%, 0) scale(1);
       </span>
 
       Archive
-      <button
-  class="menu-item"
-  onclick="showPage('book')"
->
 
-  <span>
-    📕
-  </span>
+    </button>
 
-  My Love Diary
+    <button
+      class="menu-item"
+      onclick="showPage('book')"
+    >
 
-</button>
+      <span>
+        📕
+      </span>
+
+      My Love Diary
+
+    </button>
 
   
     
@@ -1052,6 +1057,7 @@ import {
   getDocs,  
   deleteDoc,
   doc,
+  updateDoc,
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
@@ -1281,7 +1287,6 @@ const snapshot = await getDocs(collection(db, "futureLove"));
 for (const docSnap of snapshot.docs) {
 const data = docSnap.data();
 
-```
 if (
   !data.delivered &&
   data.deliverAt <= now &&
@@ -1296,7 +1301,6 @@ if (
   // そのあと通知を出す
   showLoveNotification();
 }
-```
 
 }
 }
