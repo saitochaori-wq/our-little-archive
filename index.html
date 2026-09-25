@@ -1808,8 +1808,12 @@ bookMessages.onmouseup = function(e) {
   }
 
 };
- window.onload = function() {
+window.onload = function() {
   checkFutureLove();
+
+  setInterval(() => {
+    checkFutureLove();
+  }, 1000);
 };
 
 </script>
