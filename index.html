@@ -692,6 +692,44 @@ transform: translate(-50%, 0) scale(1);
   .diary-message p, .love-text, .trash-text { font-size: 16px; }
 }
 
+
+
+/* Love Mail send button */
+.love-button {
+  display: block;
+  width: min(100%, 360px);
+  min-height: 72px;
+  margin: 28px auto 30px;
+  padding: 16px 24px;
+  border: 1px solid rgba(160, 105, 105, 0.25);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fffafa 0%, #f4dede 100%);
+  color: #6d4545;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #d7b0b0, 0 13px 22px rgba(100, 55, 55, 0.18), inset 0 2px 0 rgba(255,255,255,0.9);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.love-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 0 #d7b0b0, 0 16px 25px rgba(100, 55, 55, 0.20), inset 0 2px 0 rgba(255,255,255,0.95);
+}
+.love-button:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 #d7b0b0, 0 6px 12px rgba(100, 55, 55, 0.15), inset 0 2px 0 rgba(255,255,255,0.8);
+}
+
+
+/* Paper plane icon */
+.paper-plane {
+  display: inline-block;
+  font-size: 1.35em;
+  transform: rotate(-18deg);
+  margin-right: 8px;
+  text-shadow: 1px 2px 0 rgba(0,0,0,.15);
+}
 </style>
 
 </head>
@@ -991,7 +1029,7 @@ transform: translate(-50%, 0) scale(1);
   class="love-button"
   onclick="openLoveSend()"
 >
-  💌 Send a little love
+  <span class="paper-plane" aria-hidden="true">➤</span> Send a little love
 </button>
 
 
@@ -1336,7 +1374,7 @@ function randomFutureTime() {
 window.openLoveSend = async function() {
 
   const message =
-    prompt("Write a little love for them ♡");
+    prompt(from === "Shiori" ? "Write a little love for him ♡" : "Write a little love for her ♡");
 
   if (!message || message.trim() === "") {
     return;
