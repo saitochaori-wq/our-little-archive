@@ -1644,6 +1644,28 @@ window.loadBook = async function() {
         }
 
       };
+    /* PC用スワイプ（マウス） */
+let mouseStartX = 0;
+
+bookMessages.onmousedown = function(e) {
+  mouseStartX = e.clientX;
+};
+
+bookMessages.onmouseup = function(e) {
+  const mouseEndX = e.clientX;
+  const distance = mouseStartX - mouseEndX;
+
+  if (distance > 50 && currentPage < pages.length - 1) {
+    currentPage++;
+    renderPage();
+  }
+
+  if (distance < -50 && currentPage > 0) {
+    currentPage--;
+    renderPage();
+  }
+};
+
 
 
   } catch (error) {
