@@ -392,6 +392,10 @@ object-position: center top;
     }
 
     .logo {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
       font-size: 20px;
     }
 
@@ -819,9 +823,9 @@ transform: translate(-50%, 0) scale(1);
 
   <header>
 
-    <div class="logo">
+    <button class="logo" type="button" onclick="goHome()" aria-label="Go to home">
       Our Little Archive ♡
-    </div>
+    </button>
 
     <button
       class="menu-button"
@@ -976,7 +980,7 @@ transform: translate(-50%, 0) scale(1);
   >
 
     <h2>
-      💌 Love Mail
+      💌 Inbox
     </h2>
 
     <p class="page-description">
@@ -1277,6 +1281,16 @@ window.changePerson = function() {
    Pages
 ========================= */
 
+window.goHome = function() {
+  document.querySelectorAll(".page").forEach(function(page) {
+    page.classList.remove("active");
+  });
+
+  const home = document.getElementById("home");
+  home.style.display = "flex";
+  closeMenu();
+};
+
 window.showPage = function(pageId) {
 
   document
@@ -1299,7 +1313,7 @@ window.showPage = function(pageId) {
   loadBook();
 }
   if (pageId === "love") {
-  window.loadInbox();
+  loadInbox();
 }
   if (pageId === "trash") {
   loadTrash();
@@ -1310,7 +1324,9 @@ window.showPage = function(pageId) {
 };
 
 function randomFutureTime() {
-  return Date.now() + 5000; // テスト用：5秒後に届く
+  const oneDay = 24 * 60 * 60 * 1000;
+  const threeMonths = 90 * 24 * 60 * 60 * 1000;
+  return Date.now() + Math.floor(oneDay + Math.random() * (threeMonths - oneDay));
 }
 
 /* =========================
@@ -1397,9 +1413,14 @@ box.innerHTML = `     <div class="love-notification-inner">
 
 document.body.appendChild(box);
 
-// スマホならバイブ
-if (navigator.vibrate) {
-navigator.vibrate([100, 50, 100]);
+// スマホではバイブレーション
+// 対応しているブラウザだけ実行する
+if (typeof navigator.vibrate === "function") {
+  try {
+    navigator.vibrate([180, 80, 180, 80, 320]);
+  } catch (error) {
+    console.log("Vibration is not available on this device.");
+  }
 }
 
 // 8秒後に確実に削除
@@ -1956,7 +1977,7 @@ window.loadInbox = async function() {
           <div class="love-text">${escapeHtml(m.text || "")}</div>
           <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
           <div class="message-actions">
-            <button type="button" class="book-save-button" onclick="saveFutureLoveToDiary(event, '${m.id}')">📕 Add to Diary</button>
+            <button class="book-save-button" onclick="saveFutureLoveToDiary('${m.id}')">📕 Add to Diary</button>
           </div>
         </article>`;
     }).join('') + '</div>';
@@ -1966,60 +1987,33 @@ window.loadInbox = async function() {
   }
 };
 
-window.saveFutureLoveToDiary = async function(event, messageId) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
+window.saveFutureLoveToDiary = async function(messageId) {
   const person = document.body.dataset.person;
-  const button = event && event.currentTarget ? event.currentTarget : null;
-
-  if (button) {
-    button.disabled = true;
-    button.textContent = "Saving… ♡";
-  }
-
   try {
     const messageRef = doc(db, "futureLove", messageId);
     const snapshot = await getDocs(collection(db, "futureLove"));
     let message = null;
-
     snapshot.forEach(function(snap) {
-      if (snap.id === messageId) {
-        message = { id: snap.id, ...snap.data() };
-      }
+      if (snap.id === messageId) message = { id: snap.id, ...snap.data() };
     });
+    if (!message) return;
 
-    if (!message) {
-      throw new Error("Message not found");
-    }
-
-    // First save a copy in My Love Diary.
     await addDoc(collection(db, "savedLove"), {
       person: person,
       loveId: message.id,
-      from: message.from || "",
-      message: message.text || "",
+      from: message.from,
+      message: message.text,
       date: new Date(message.createdAt || Date.now()).toISOString(),
       savedAt: new Date().toISOString(),
       source: "futureLove"
     });
 
-    // Then mark the Inbox message as saved so it disappears from Inbox.
     await updateDoc(messageRef, { savedToDiary: true });
-
-    // Stay on Love Mail and refresh only the Inbox.
-    await window.loadInbox();
-
+    await loadInbox();
     alert("Added to My Love Diary 📕♡");
   } catch (error) {
-    console.error("Add to Diary failed:", error);
-    if (button) {
-      button.disabled = false;
-      button.textContent = "📕 Add to Diary";
-    }
-    alert("Could not add this love to your diary ♡\n\n" + (error.message || error));
+    console.error(error);
+    alert("Something went wrong while adding this love.");
   }
 };
 
