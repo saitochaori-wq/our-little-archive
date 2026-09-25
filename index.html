@@ -1254,9 +1254,11 @@ if (
 function showLoveNotification() {
 const box = document.createElement("div");
 box.className = "love-notification";
+
 box.innerHTML = `     <div class="love-notification-inner">
-      💌 You received a new love message ♡     </div>
+      💌 You received a little love message ♡     </div>
   `;
+
 document.body.appendChild(box);
 
 // スマホならバイブ
@@ -1264,10 +1266,13 @@ if (navigator.vibrate) {
 navigator.vibrate([100, 50, 100]);
 }
 
-// 8秒後に消える
-setTimeout(() => box.remove(), 8000);
+// 8秒後に確実に削除
+setTimeout(() => {
+if (box && box.parentNode) {
+box.parentNode.removeChild(box);
 }
-
+}, 8000);
+}
 
 /* =========================
    Load Inbox (Delivered Love)
