@@ -874,17 +874,11 @@ object-position: center top;
   💌 Send a little love
 </button>
 
-<button
-  class="love-button"
-  onclick="showLoveMessage()"
->
-  💗 Give me a little love
-</button>
 
-    <div
-      id="loveMessage"
-      class="love-message"
-    ></div>
+<div
+  id="loveInbox"
+  class="love-message"
+></div>
 
       
 
@@ -1169,13 +1163,20 @@ window.showPage = function(pageId) {
   if (pageId === "book") {
   loadBook();
 }
+  if (pageId === "love") {
+  loadInbox();
+}
+
   closeMenu();
 
 };
 
+function randomFutureTime() {
+  return Date.now() + 5000; // テスト用：5秒後に届く
+}
 
 /* =========================
-   Send Love
+   Send Love (Future Delivery)
 ========================= */
 
 window.openLoveSend = async function() {
@@ -1183,40 +1184,118 @@ window.openLoveSend = async function() {
   const message =
     prompt("Write a little love for them ♡");
 
-  if (
-    !message ||
-    message.trim() === ""
-  ) {
+  if (!message || message.trim() === "") {
     return;
   }
 
-  const from =
-    document.body.dataset.person;
+  const from = document.body.dataset.person;
+  const to = from === "Kai" ? "Shiori" : "Kai"; // お互いに送れる
 
   try {
 
     await addDoc(
-      collection(db, "loveMessages"),
+      collection(db, "futureLove"),
       {
         from: from,
-        message: message.trim(),
-        date: new Date().toISOString()
+        to: to,
+        text: message.trim(),
+        createdAt: Date.now(),
+        deliverAt: randomFutureTime(), // ← ランダム未来
+        delivered: false
       }
     );
 
-    alert("Your little love has been sent ♡");
+    alert("Your love will arrive in the future ♡");
 
   } catch (error) {
 
     console.error(error);
 
-    alert(
-      "Something went wrong while sending your love."
-    );
+    alert("Something went wrong while sending your love.");
 
   }
 
 };
+/* =========================
+   Check Future Love (Notification)
+========================= */
+
+async function checkFutureLove() {
+  const now = Date.now();
+  const snapshot = await getDocs(collection(db, "futureLove"));
+
+  snapshot.forEach(async doc => {
+    const data = doc.data();
+
+    // 届いたかどうか判定
+    if (!data.delivered && data.deliverAt <= now) {
+
+      // 通知を出す
+      showLoveNotification(data.text);
+
+      // delivered を true に更新（通知は一度だけ）
+      await updateDoc(doc.ref, { delivered: true });
+    }
+  });
+}
+/* =========================
+   Love Notification
+========================= */
+
+function showLoveNotification(message) {
+  const box = document.createElement("div");
+  box.className = "love-notification";
+  box.innerHTML = `
+    <div class="love-notification-inner">
+      💌 A new love message arrived ♡<br><br>
+      ${message}
+    </div>
+  `;
+  document.body.appendChild(box);
+
+  // スマホならバイブ
+  if (navigator.vibrate) {
+    navigator.vibrate([100, 50, 100]);
+  }
+
+  // 8秒後に消える
+  setTimeout(() => box.remove(), 8000);
+}
+
+/* =========================
+   Load Inbox (Delivered Love)
+========================= */
+
+async function loadInbox() {
+  const snapshot = await getDocs(collection(db, "futureLove"));
+  const arrived = [];
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+
+    // 届いたメッセージだけを集める
+    if (data.delivered) {
+      arrived.push(data);
+    }
+  });
+
+  // 届いた順に並べる
+  arrived.sort((a, b) => a.deliverAt - b.deliverAt);
+
+  // HTML に並べる
+  const inbox = document.getElementById("loveInbox");
+
+  inbox.innerHTML = arrived.map(m => `
+    <div class="love-item">
+      <div class="love-text">${m.text}</div>
+      <div class="love-meta">
+        from: ${m.from}<br>
+        sent: ${new Date(m.createdAt).toLocaleDateString()}<br>
+        delivered: ${new Date(m.deliverAt).toLocaleDateString()}
+      </div>
+    </div>
+  `).join("");
+}
 
 
 /* =========================
@@ -1729,6 +1808,11 @@ bookMessages.onmouseup = function(e) {
   }
 
 };
+ checkFutureLove();
+ window.onload = function() {
+  checkFutureLove();
+};
+
 </script>
 </body>
 </html>
