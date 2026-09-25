@@ -644,6 +644,50 @@ transform: translate(-50%, 0) scale(1);
 }
 }
 
+
+
+/* =========================
+   Inbox / Diary / Trash — clean layout
+========================= */
+#love, #book, #trash { max-width: 900px; margin: 24px auto; }
+.mail-inbox-header {
+  margin-top: 28px;
+  padding: 18px 20px;
+  background: rgba(255,255,255,.58);
+  border: 1px solid rgba(120,90,70,.12);
+  border-radius: 18px;
+}
+.mail-inbox-header h3 { margin: 0; font-family: Georgia, serif; font-size: 22px; }
+.mail-inbox-header p { margin: 6px 0 0; color: #8a7258; font-size: 13px; }
+
+.love-message, #bookMessages, #trashMessages { width: 100%; }
+.inbox-list, .trash-list { display: grid; gap: 16px; margin-top: 24px; }
+.love-item, .trash-item {
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(120,90,70,.14);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(80,55,45,.08);
+}
+.love-text, .trash-text { font-size: 17px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+.love-meta, .trash-meta { margin-top: 10px; color: #8a7258; font-size: 12px; line-height: 1.6; }
+.message-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+.message-actions button, .book-delete-button, .restore-button, .empty-trash-button {
+  border: 0; border-radius: 999px; padding: 10px 15px; cursor:pointer; font-family:inherit;
+}
+.book-save-button { background:#7d5b45; color:white; border:0; border-radius:999px; padding:10px 16px; cursor:pointer; font-family:inherit; }
+.book-delete-button { background:#ead7d2; color:#694a43; }
+.restore-button { background:#e8dcc7; color:#5f4b36; }
+.empty-trash-button { background:#6b4f4f; color:white; }
+#trash { background:#f7f0ed; border-radius:18px; padding:24px; }
+#trash h2 { margin-top:0; }
+.section-note { color:#8a7770; font-size:14px; line-height:1.6; }
+@media (max-width: 600px) {
+  #love, #book, #trash { margin: 14px 10px; padding: 20px 14px; }
+  .diary-page { padding: 24px 20px; }
+  .diary-message p, .love-text, .trash-text { font-size: 16px; }
+}
+
 </style>
 
 </head>
@@ -854,10 +898,10 @@ transform: translate(-50%, 0) scale(1);
     >
 
       <span>
-        💗
+        💌
       </span>
 
-      Love
+      Love Mail
 
     </button>
 
@@ -902,6 +946,19 @@ transform: translate(-50%, 0) scale(1);
 
     </button>
 
+    <button
+      class="menu-item"
+      onclick="showPage('trash')"
+    >
+
+      <span>
+        🗑️
+      </span>
+
+      Trash
+
+    </button>
+
   
     
     <button class="menu-item" onclick="changePerson()">
@@ -919,11 +976,11 @@ transform: translate(-50%, 0) scale(1);
   >
 
     <h2>
-      💗 Love
+      💌 Love Mail
     </h2>
 
     <p class="page-description">
-  Little things we want each other to know.
+  Little love messages that have arrived for you.
 </p>
 
 <button
@@ -933,6 +990,11 @@ transform: translate(-50%, 0) scale(1);
   💌 Send a little love
 </button>
 
+
+<div class="mail-inbox-header">
+  <h3>📥 Inbox</h3>
+  <p>Messages from your love will appear here ♡</p>
+</div>
 
 <div
   id="loveInbox"
@@ -1020,6 +1082,19 @@ transform: translate(-50%, 0) scale(1);
   </section>
 
  
+
+
+<section id="trash" class="page">
+
+  <h2>🗑️ Trash</h2>
+
+  <p class="section-note">Messages removed from your Diary stay here until you permanently delete or restore them.</p>
+
+  <div id="trashMessages">
+    <div class="coming-soon">Your deleted little loves will live here ♡</div>
+  </div>
+
+</section>
 
 
 <section id="book" class="page">
@@ -1224,7 +1299,10 @@ window.showPage = function(pageId) {
   loadBook();
 }
   if (pageId === "love") {
-  loadInbox();
+  window.loadInbox();
+}
+  if (pageId === "trash") {
+  loadTrash();
 }
 
   closeMenu();
@@ -1335,41 +1413,6 @@ box.parentNode.removeChild(box);
 /* =========================
    Load Inbox (Delivered Love)
 ========================= */
-
-async function loadInbox() {
-  const snapshot = await getDocs(collection(db, "futureLove"));
-  const arrived = [];
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-
-    // 届いたメッセージだけを集める
-  if (
-  data.delivered &&
-  data.to === document.body.dataset.person
-) {
-  arrived.push(data);
-}
-  });
-
-  // 届いた順に並べる
-  arrived.sort((a, b) => a.deliverAt - b.deliverAt);
-
-  // HTML に並べる
-  const inbox = document.getElementById("loveInbox");
-
-  inbox.innerHTML = arrived.map(m => `
-    <div class="love-item">
-      <div class="love-text">${m.text}</div>
-      <div class="love-meta">
-        from: ${m.from}<br>
-        sent: ${new Date(m.createdAt).toLocaleDateString()}<br>
-        delivered: ${new Date(m.deliverAt).toLocaleDateString()}
-      </div>
-    </div>
-  `).join("");
-}
-
 
 /* =========================
    Show Love
@@ -1881,6 +1924,190 @@ bookMessages.onmouseup = function(e) {
   }
 
 };
+
+/* =========================
+   New Inbox → Diary → Trash system
+========================= */
+
+window.loadInbox = async function() {
+  const inbox = document.getElementById("loveInbox");
+  inbox.innerHTML = "Loading your inbox... ♡";
+  const person = document.body.dataset.person;
+
+  try {
+    const snapshot = await getDocs(collection(db, "futureLove"));
+    const messages = [];
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      if (m.to === person && m.delivered && !m.savedToDiary && !m.trashed) {
+        messages.push({ id: snap.id, ...m });
+      }
+    });
+    messages.sort((a,b) => (a.deliverAt || 0) - (b.deliverAt || 0));
+
+    if (!messages.length) {
+      inbox.innerHTML = '<div class="coming-soon">No new little love yet ♡</div>';
+      return;
+    }
+
+    inbox.innerHTML = '<div class="inbox-list">' + messages.map(function(m) {
+      return `
+        <article class="love-item">
+          <div class="love-text">${escapeHtml(m.text || "")}</div>
+          <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
+          <div class="message-actions">
+            <button type="button" class="book-save-button" onclick="saveFutureLoveToDiary(event, '${m.id}')">📕 Add to Diary</button>
+          </div>
+        </article>`;
+    }).join('') + '</div>';
+  } catch (error) {
+    console.error(error);
+    inbox.innerHTML = '<div class="coming-soon">Could not open your inbox ♡</div>';
+  }
+};
+
+window.saveFutureLoveToDiary = async function(event, messageId) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  const person = document.body.dataset.person;
+  const button = event && event.currentTarget ? event.currentTarget : null;
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Saving… ♡";
+  }
+
+  try {
+    const messageRef = doc(db, "futureLove", messageId);
+    const snapshot = await getDocs(collection(db, "futureLove"));
+    let message = null;
+
+    snapshot.forEach(function(snap) {
+      if (snap.id === messageId) {
+        message = { id: snap.id, ...snap.data() };
+      }
+    });
+
+    if (!message) {
+      throw new Error("Message not found");
+    }
+
+    // First save a copy in My Love Diary.
+    await addDoc(collection(db, "savedLove"), {
+      person: person,
+      loveId: message.id,
+      from: message.from || "",
+      message: message.text || "",
+      date: new Date(message.createdAt || Date.now()).toISOString(),
+      savedAt: new Date().toISOString(),
+      source: "futureLove"
+    });
+
+    // Then mark the Inbox message as saved so it disappears from Inbox.
+    await updateDoc(messageRef, { savedToDiary: true });
+
+    // Stay on Love Mail and refresh only the Inbox.
+    await window.loadInbox();
+
+    alert("Added to My Love Diary 📕♡");
+  } catch (error) {
+    console.error("Add to Diary failed:", error);
+    if (button) {
+      button.disabled = false;
+      button.textContent = "📕 Add to Diary";
+    }
+    alert("Could not add this love to your diary ♡\n\n" + (error.message || error));
+  }
+};
+
+window.loadTrash = async function() {
+  const box = document.getElementById("trashMessages");
+  box.innerHTML = "Opening your trash... ♡";
+  const person = document.body.dataset.person;
+  try {
+    const snapshot = await getDocs(collection(db, "trashLove"));
+    const items = [];
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      if (m.person === person) items.push({ id: snap.id, ...m });
+    });
+    items.sort((a,b) => new Date(b.deletedAt || 0) - new Date(a.deletedAt || 0));
+    if (!items.length) {
+      box.innerHTML = '<div class="coming-soon">Trash is empty ♡</div>';
+      return;
+    }
+    box.innerHTML = '<div class="trash-list">' + items.map(function(m) {
+      return `
+        <article class="trash-item">
+          <div class="trash-text">${escapeHtml(m.message || "")}</div>
+          <div class="trash-meta">from ${escapeHtml(m.from || "")} · deleted ${new Date(m.deletedAt || Date.now()).toLocaleDateString("en-GB")}</div>
+          <div class="message-actions">
+            <button class="restore-button" onclick="restoreLoveFromTrash('${m.id}')">↩ Restore</button>
+            <button class="empty-trash-button" onclick="permanentlyDeleteTrash('${m.id}')">Delete forever</button>
+          </div>
+        </article>`;
+    }).join('') + '</div>';
+  } catch (error) {
+    console.error(error);
+    box.innerHTML = '<div class="coming-soon">Could not open trash ♡</div>';
+  }
+};
+
+window.deleteLoveFromBook = async function(loveId) {
+  const person = document.body.dataset.person;
+  try {
+    const snapshot = await getDocs(collection(db, "savedLove"));
+    let found = null;
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      if (snap.id === loveId || (m.loveId === loveId && m.person === person)) {
+        if (!found) found = { id: snap.id, ...m };
+      }
+    });
+    if (!found) return;
+    await addDoc(collection(db, "trashLove"), {
+      ...found,
+      originalSavedLoveId: found.id,
+      deletedAt: new Date().toISOString()
+    });
+    await deleteDoc(doc(db, "savedLove", found.id));
+    loadBook();
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong while moving this love to Trash.");
+  }
+};
+
+window.restoreLoveFromTrash = async function(trashId) {
+  try {
+    const snapshot = await getDocs(collection(db, "trashLove"));
+    let found = null;
+    snapshot.forEach(function(snap) { if (snap.id === trashId) found = { id: snap.id, ...snap.data() }; });
+    if (!found) return;
+    const { id, originalSavedLoveId, deletedAt, ...data } = found;
+    await addDoc(collection(db, "savedLove"), data);
+    await deleteDoc(doc(db, "trashLove", trashId));
+    loadTrash();
+  } catch (error) {
+    console.error(error);
+    alert("Could not restore this love.");
+  }
+};
+
+window.permanentlyDeleteTrash = async function(trashId) {
+  if (!confirm("Delete this little love forever?")) return;
+  try {
+    await deleteDoc(doc(db, "trashLove", trashId));
+    loadTrash();
+  } catch (error) {
+    console.error(error);
+    alert("Could not delete this love.");
+  }
+};
+
 window.onload = function() {
   checkFutureLove();
 
