@@ -1228,7 +1228,11 @@ async function checkFutureLove() {
     const data = doc.data();
 
     // 届いたかどうか判定
-    if (!data.delivered && data.deliverAt <= now) {
+    if (
+  !data.delivered &&
+  data.deliverAt <= now &&
+  data.to === document.body.dataset.person
+) {
 
       // 通知を出す
       showLoveNotification(data.text);
