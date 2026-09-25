@@ -1221,27 +1221,32 @@ window.openLoveSend = async function() {
 ========================= */
 
 async function checkFutureLove() {
-  const now = Date.now();
-  const snapshot = await getDocs(collection(db, "futureLove"));
+const now = Date.now();
+const snapshot = await getDocs(collection(db, "futureLove"));
 
-  snapshot.forEach(async doc => {
-    const data = doc.data();
+for (const docSnap of snapshot.docs) {
+const data = docSnap.data();
 
-    // 届いたかどうか判定
-    if (
+```
+if (
   !data.delivered &&
   data.deliverAt <= now &&
   data.to === document.body.dataset.person
 ) {
 
-      // 通知を出す
-      showLoveNotification();
-
-      // delivered を true に更新（通知は一度だけ）
-      await updateDoc(doc.ref, { delivered: true });
-    }
+  // 先に delivered を true にする
+  await updateDoc(docSnap.ref, {
+    delivered: true
   });
+
+  // そのあと通知を出す
+  showLoveNotification();
 }
+```
+
+}
+}
+
 /* =========================
    Love Notification
 ========================= */
