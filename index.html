@@ -1276,9 +1276,12 @@ async function loadInbox() {
     const data = doc.data();
 
     // 届いたメッセージだけを集める
-    if (data.delivered) {
-      arrived.push(data);
-    }
+  if (
+  data.delivered &&
+  data.to === document.body.dataset.person
+) {
+  arrived.push(data);
+}
   });
 
   // 届いた順に並べる
