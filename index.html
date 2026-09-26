@@ -1026,8 +1026,9 @@ transform: translate(-50%, 0) scale(1);
 </p>
 
 <button
+  id="sendLoveButton"
+  type="button"
   class="love-button"
-  onclick="openLoveSend()"
 >
   <span class="paper-plane" aria-hidden="true">➤</span> Send a little love
 </button>
@@ -1374,40 +1375,56 @@ function randomFutureTime() {
 window.openLoveSend = async function() {
 
   const from = document.body.dataset.person;
-  const to = from === "Kai" ? "Shiori" : "Kai"; // お互いに送れる
 
-  const message =
-    prompt(from === "Shiori" ? "Write a little love for him ♡" : "Write a little love for her ♡");
+  if (from !== "Shiori" && from !== "Kai") {
+    alert("Please choose your name first ♡");
+    return;
+  }
+
+  const to = from === "Kai" ? "Shiori" : "Kai";
+  const message = prompt(
+    from === "Shiori"
+      ? "Write a little love for him ♡"
+      : "Write a little love for her ♡"
+  );
 
   if (!message || message.trim() === "") {
     return;
   }
 
   try {
+    const deliverAt = randomFutureTime();
 
-    await addDoc(
-      collection(db, "futureLove"),
-      {
-        from: from,
-        to: to,
-        text: message.trim(),
-        createdAt: Date.now(),
-        deliverAt: randomFutureTime(), // ← ランダム未来
-        delivered: false
-      }
-    );
+    await addDoc(collection(db, "futureLove"), {
+      from: from,
+      to: to,
+      text: message.trim(),
+      createdAt: Date.now(),
+      deliverAt: deliverAt,
+      delivered: false,
+      savedToDiary: false,
+      trashed: false
+    });
 
-    alert("Your love will arrive in the future ♡");
+    alert("Your love has been sent ♡\nIt will arrive sometime in the future.");
 
   } catch (error) {
-
-    console.error(error);
-
-    alert("Something went wrong while sending your love.");
-
+    console.error("Send Love error:", error);
+    alert(
+      "Your love could not be sent ♡\n\n" +
+      (error && error.code ? error.code : "Please check your Firebase connection.")
+    );
   }
 
 };
+
+// Send button: register the click directly so it always calls the function.
+const sendLoveButton = document.getElementById("sendLoveButton");
+if (sendLoveButton) {
+  sendLoveButton.addEventListener("click", function() {
+    window.openLoveSend();
+  });
+}
 /* =========================
    Check Future Love (Notification)
 ========================= */
