@@ -1,0 +1,4339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fff8f5">
+
+  <title>Our Little Archive ♡</title>
+  <link id="dynamicFavicon" rel="icon" href="" type="image/png">
+  <link id="dynamicAppleTouchIcon" rel="apple-touch-icon" href="">
+
+
+
+  <style>
+   /* =========================
+   My Love Diary
+========================= */
+
+#book {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(90, 55, 30, 0.12),
+      transparent 8%,
+      transparent 92%,
+      rgba(90, 55, 30, 0.12)
+    ),
+    #f3e4c4;
+
+  border-radius: 8px;
+  padding: 28px 24px;
+  box-shadow:
+    0 10px 25px rgba(60, 40, 20, 0.25),
+    inset 0 0 25px rgba(100, 70, 35, 0.12);
+
+  color: #4d3828;
+
+  min-height: 400px;
+}
+
+#book h2 {
+  font-family: Georgia, serif;
+  letter-spacing: 1px;
+}
+
+#bookMessages {
+  margin-top: 25px;
+}
+
+#bookMessages {
+  position: relative;
+  overflow: hidden;
+  min-height: 360px;
+  perspective: 1200px;
+  touch-action: pan-y;
+}
+
+.diary-page {
+  position: relative;
+  min-height: 360px;
+  background:
+    linear-gradient(
+      to right,
+      #d8bd91 0%,
+      #f3e4c4 6%,
+      #f8efd9 14%,
+      #f8efd9 100%
+    );
+  border: 1px solid #b89b70;
+  border-radius: 4px;
+  padding: 35px 45px 35px 35px;
+  box-shadow:
+    8px 10px 20px rgba(60, 40, 20, 0.22),
+    inset 12px 0 18px rgba(80, 50, 25, 0.12);
+  animation: diaryPageIn 0.6s ease;
+}
+
+.diary-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.diary-message {
+  padding: 18px 10px;
+  border-bottom: 1px solid rgba(100, 70, 35, 0.18);
+  font-family: Georgia, serif;
+  color: #4d3828;
+}
+
+.diary-message:last-child {
+  border-bottom: none;
+}
+
+.diary-message p {
+  margin: 0 0 10px;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.diary-message small {
+  color: #8a7258;
+  font-size: 12px;
+}
+
+.page-corner {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 42px;
+  height: 42px;
+  background:
+    linear-gradient(
+      135deg,
+      transparent 49%,
+      #d8bd91 50%,
+      #f3e4c4 51%
+    );
+  box-shadow:
+    -2px -2px 5px rgba(60, 40, 20, 0.12);
+  pointer-events: none;
+}
+
+.page-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  font-family: Georgia, serif;
+  font-size: 11px;
+  color: #9b8062;
+  animation: swipeHint 1.8s ease-in-out infinite;
+}
+
+@keyframes diaryPageIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) rotateY(-8deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) rotateY(0);
+  }
+}
+
+@keyframes swipeHint {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: translateX(5px);
+    opacity: 0.9;
+  }
+}
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+      background: #fff8f5;
+      color: #4a3b3b;
+      overflow-x: hidden;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+/* =========================
+   My Love Diary — Right Page
+========================= */
+
+#book {
+  position: relative;
+
+  width: 100%;
+  min-height: 400px;
+
+  background:
+    linear-gradient(
+      to right,
+      #d8bd91 0%,
+      #f3e4c4 5%,
+      #f8efd9 12%,
+      #f8efd9 100%
+    );
+
+  border: 1px solid #b89b70;
+  border-radius: 5px;
+
+  box-shadow:
+    8px 10px 20px rgba(60, 40, 20, 0.25),
+    inset 12px 0 18px rgba(80, 50, 25, 0.12);
+
+  overflow: hidden;
+}
+
+/* 右ページの紙 */
+#bookMessages {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  perspective: 1000px;
+}
+
+/* ページをめくる */
+#bookMessages .love-card {
+  position: relative;
+
+  transform-origin: left center;
+
+  animation:
+    pageTurn 0.8s cubic-bezier(.22,.61,.36,1);
+
+  box-shadow:
+    0 3px 8px rgba(60, 40, 20, 0.15),
+    inset 0 0 25px rgba(120, 90, 50, 0.08);
+}
+
+@keyframes pageTurn {
+
+  0% {
+    opacity: 0;
+    transform:
+      translateX(100%)
+      rotateY(15deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      translateX(0)
+      rotateY(0);
+  }
+
+}
+    /* =========================
+       Login screen
+    ========================= */
+
+    #loginScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #fff8f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    .login-box {
+      width: min(430px, 100%);
+    }
+
+    .login-kicker {
+      font-size: 18px;
+      color: #9a6879;
+      margin-bottom: 5px;
+    }
+
+    .login-title {
+      font-size: 38px;
+      font-weight: normal;
+      margin: 0 0 14px;
+    }
+
+    .login-question {
+      font-size: 21px;
+      color: #8a7070;
+      margin: 0 0 28px;
+    }
+
+    .person-choice {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      border-radius: 28px;
+      background: #fffdfb;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      font-size: 22px;
+      text-align: left;
+      transition: transform 0.15s ease,
+                  box-shadow 0.15s ease;
+    }
+
+    .person-choice:hover {
+      transform: scale(1.015);
+      box-shadow: 0 7px 22px rgba(80, 50, 50, 0.10);
+    }
+
+    .person-choice.shiori {
+      border: 2px solid #efb6ca;
+      color: #b86f89;
+    }
+
+    .person-choice.kai {
+      border: 2px solid #aec8e5;
+      color: #6f98bf;
+    }
+
+    .avatar {
+      width: 76px;
+      height: 76px;
+      flex: 0 0 76px;
+      border-radius: 50%;
+      object-fit: cover;
+object-position: center top;
+      background: #f4ece9;
+    }
+
+    .choice-arrow {
+      margin-left: auto;
+      font-size: 26px;
+    }
+
+    /* Remember popup */
+
+    #rememberBox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      background: rgba(50, 30, 30, 0.20);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .remember-card {
+      width: min(360px, 100%);
+      background: #fffdfb;
+      border-radius: 24px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 12px 35px rgba(60, 40, 40, 0.16);
+    }
+
+    .remember-card h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      font-weight: normal;
+    }
+
+    .remember-card p {
+      color: #8a7070;
+      line-height: 1.6;
+      margin: 0 0 22px;
+    }
+
+    .remember-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .remember-actions button {
+      flex: 1;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 10px;
+      font-family: Georgia, serif;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .yes-button {
+      background: #f7d4df;
+      color: #8d5369;
+    }
+
+    .no-button {
+      background: #f1e9e6;
+      color: #6f5e5e;
+    }
+
+    /* =========================
+       Header
+    ========================= */
+
+    header {
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 22px;
+    }
+
+    .logo {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+      font-size: 20px;
+    }
+
+    .menu-button {
+      border: none;
+      background: transparent;
+      font-size: 28px;
+      cursor: pointer;
+      color: #4a3b3b;
+      padding: 8px;
+    }
+
+    /* =========================
+       Home
+    ========================= */
+
+    .home {
+      min-height: calc(100vh - 70px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .home-content {
+      max-width: 500px;
+    }
+
+    .home h1 {
+      font-size: 42px;
+      font-weight: normal;
+      margin: 0 0 15px;
+    }
+
+    .home p {
+      font-size: 16px;
+      color: #8a7070;
+      line-height: 1.8;
+    }
+
+    /* =========================
+       Side menu
+    ========================= */
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(50, 30, 30, 0.18);
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.3s;
+      z-index: 10;
+    }
+
+    .menu-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(320px, 85vw);
+      height: 100vh;
+      background: #fffdfb;
+      padding: 30px 25px;
+      box-shadow: -5px 0 25px rgba(60, 40, 40, 0.12);
+      transform: translateX(100%);
+      transition: transform 0.35s ease;
+      z-index: 20;
+    }
+
+    .side-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .menu-title {
+      font-size: 22px;
+    }
+
+    .close-button {
+      border: none;
+      background: transparent;
+      font-size: 25px;
+      cursor: pointer;
+      color: #4a3b3b;
+    }
+
+    .menu-item {
+      display: block;
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: left;
+      padding: 18px 5px;
+      font-family: Georgia, serif;
+      font-size: 19px;
+      color: #4a3b3b;
+      cursor: pointer;
+      border-bottom: 1px solid #eee2df;
+    }
+
+    .menu-item span {
+      margin-right: 12px;
+    }
+
+    .menu-item:hover {
+      background: #fff8f5;
+    }
+
+    /* =========================
+       Pages
+    ========================= */
+
+    .page {
+      display: none;
+      padding: 50px 25px;
+      max-width: 700px;
+      margin: auto;
+      min-height: calc(100vh - 70px);
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page h2 {
+      font-size: 32px;
+      font-weight: normal;
+      margin-bottom: 10px;
+    }
+
+    .page-description {
+      color: #8a7070;
+      line-height: 1.7;
+      margin-bottom: 35px;
+    }
+
+    .memory-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 15px rgba(80, 50, 50, 0.07);
+    }
+
+    .memory-date {
+      font-size: 13px;
+      color: #9a8585;
+      margin-bottom: 7px;
+    }
+
+    .memory-title {
+      font-size: 20px;
+    }
+
+    .memory-description {
+      font-size: 14px;
+      color: #8a7070;
+      margin-top: 7px;
+    }
+
+    .archive-photos-section {
+      margin-top: 24px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 20px;
+      background: rgba(255,255,255,.48);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .archive-photos-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .archive-photos-header h3 {
+      margin: 0 0 4px;
+    }
+
+    .archive-upload-button,
+    .archive-create-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 9px 15px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      color: #6b4f4f;
+      border: 1px solid rgba(120,80,80,.18);
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(80,50,50,.10);
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      font-family: inherit;
+    }
+
+    .archive-upload-button:hover,
+    .archive-create-button:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 6px 16px rgba(80,50,50,.14);
+    }
+
+    .archive-photo-status {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.65);
+      font-size: 13px;
+    }
+
+    .archive-album-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .archive-album-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(120,90,70,.12);
+      box-shadow: 0 5px 16px rgba(80,50,50,.08);
+    }
+
+    .archive-album-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .archive-album-title {
+      margin: 0;
+      font-size: 18px;
+      font-family: Georgia, serif;
+      color: #5f4b47;
+      word-break: break-word;
+    }
+
+    .archive-album-count {
+      flex: 0 0 auto;
+      font-size: 11px;
+      color: #8a7770;
+      white-space: nowrap;
+    }
+
+    .archive-album-delete-button {
+      border: 0;
+      background: transparent;
+      color: #8a6666;
+      font-size: 11px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .archive-album-delete-button:hover {
+      background: rgba(150,90,90,.10);
+      color: #6f4d4d;
+    }
+
+    .archive-album-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .archive-album-photos {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .archive-album-photos .archive-photo-card {
+      overflow: hidden;
+      border-radius: 12px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 4px 12px rgba(80,50,50,.08);
+    }
+
+
+    .archive-photo-wrap { position: relative; }
+    .archive-photo-open {
+      display: block; border: 0; padding: 0; margin: 0; width: 100%;
+      background: transparent; cursor: zoom-in;
+    }
+    .archive-photo-delete-button {
+      position: absolute; top: 6px; right: 6px; z-index: 2;
+      width: 16px; height: 16px; border: 0; border-radius: 50%;
+      background: rgba(0,0,0,.52); color: #fff; cursor: pointer;
+      font-size: 9px; line-height: 1; display: inline-flex;
+      align-items: center; justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,.16);
+    }
+    .archive-photo-delete-button:hover { background: rgba(0,0,0,.72); }
+    .archive-photo-lightbox {
+      position: fixed; inset: 0; z-index: 100000;
+      display: none; align-items: center; justify-content: center;
+      padding: 22px; background: rgba(0,0,0,.82);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    }
+    .archive-photo-lightbox.open { display: flex; }
+    .archive-photo-lightbox img {
+      max-width: 94vw; max-height: 88vh; object-fit: contain;
+      border-radius: 12px; box-shadow: 0 15px 50px rgba(0,0,0,.35);
+      background: #fff;
+    }
+    .archive-photo-lightbox-close {
+      position: absolute; top: 14px; right: 18px;
+      width: 42px; height: 42px; border: 0; border-radius: 50%;
+      background: rgba(255,255,255,.16); color: #fff;
+      font-size: 28px; cursor: pointer;
+    }
+
+    .archive-photo-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: rgba(0,0,0,.04);
+    }
+
+    .archive-photo-meta {
+      padding: 7px 8px 8px;
+      font-size: 10px;
+      line-height: 1.35;
+      color: #6b5555;
+    }
+
+    .archive-photo-meta strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .archive-photo-title-button {
+      display: block;
+      width: 100%;
+      border: 0;
+      padding: 0;
+      margin: 0 0 2px;
+      background: transparent;
+      color: #6b5555;
+      text-align: left;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      word-break: break-word;
+    }
+
+    .archive-photo-title-button:hover {
+      text-decoration: underline;
+    }
+
+    .archive-album-add-row {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .archive-album-add-row .archive-upload-button {
+      min-height: 36px;
+      padding: 7px 12px;
+      font-size: 12px;
+      width: fit-content;
+      align-self: flex-end;
+    }
+
+    .archive-dropzone {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border: 1px dashed rgba(100,75,75,.28);
+      border-radius: 14px;
+      background: rgba(255,255,255,.36);
+      color: #765f5f;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: background .15s ease, border-color .15s ease, transform .15s ease;
+    }
+
+    .archive-dropzone:hover,
+    .archive-dropzone:focus-visible,
+    .archive-mobile-hint{font-size:12px;opacity:.72;margin-top:6px;text-align:center;line-height:1.45;}
+
+    .archive-dropzone.drag-over {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(100,75,75,.45);
+      transform: translateY(-1px);
+    }
+
+    .archive-unsorted {
+      margin-top: 20px;
+    }
+
+    .archive-unsorted h4 {
+      margin: 0 0 10px;
+      font-family: Georgia, serif;
+      color: #5f4b47;
+    }
+
+    .archive-unsorted-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .archive-empty {
+      text-align: center;
+      padding: 24px 12px;
+      color: #9a8585;
+      font-size: 13px;
+    }
+
+    @media (max-width: 500px) {
+      .archive-album-photos { gap: 6px; }
+      .archive-album-card { padding: 12px; }
+    }
+
+    .coming-soon {
+      text-align: center;
+      margin-top: 80px;
+      color: #9a8585;
+    }
+
+    @media (max-width: 500px) {
+      .home h1 {
+        font-size: 34px;
+      }
+
+      .logo {
+        font-size: 17px;
+      }
+
+      .page {
+        padding: 35px 20px;
+      }
+
+      .login-title {
+        font-size: 32px;
+      }
+    }
+/* =========================
+Love Notification
+========================= */
+
+.love-notification {
+position: fixed;
+top: 12px;
+left: 50%;
+z-index: 99999;
+
+width: calc(100% - 24px);
+max-width: 380px;
+
+background: rgba(255, 253, 251, 0.97);
+color: #8d5369;
+
+border: 1px solid rgba(239, 182, 202, 0.55);
+border-radius: 18px;
+
+padding: 14px 18px;
+
+box-shadow:
+0 8px 28px rgba(80, 50, 60, 0.18),
+0 2px 8px rgba(80, 50, 60, 0.08);
+
+pointer-events: none;
+
+animation: loveNotificationIn 0.45s cubic-bezier(.22,.61,.36,1) forwards;
+}
+
+.love-notification-inner {
+text-align: center;
+font-family: Georgia, serif;
+font-size: 14px;
+line-height: 1.5;
+color: #8d5369;
+}
+
+@keyframes loveNotificationIn {
+0% {
+opacity: 0;
+transform: translate(-50%, -120px) scale(0.92);
+}
+
+70% {
+opacity: 1;
+transform: translate(-50%, 5px) scale(1.02);
+}
+
+100% {
+opacity: 1;
+transform: translate(-50%, 0) scale(1);
+}
+}
+
+
+
+/* =========================
+   Inbox / Diary / Trash — clean layout
+========================= */
+#love, #book, #trash { max-width: 900px; margin: 24px auto; }
+.mail-inbox-header {
+  margin-top: 28px;
+  padding: 18px 20px;
+  background: rgba(255,255,255,.58);
+  border: 1px solid rgba(120,90,70,.12);
+  border-radius: 18px;
+}
+.mail-inbox-header h3 { margin: 0; font-family: Georgia, serif; font-size: 22px; }
+.mail-inbox-header p { margin: 6px 0 0; color: #8a7258; font-size: 13px; }
+
+.love-message, #bookMessages, #trashMessages { width: 100%; }
+.inbox-list, .trash-list { display: grid; gap: 16px; margin-top: 24px; }
+.love-item, .trash-item {
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(120,90,70,.14);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(80,55,45,.08);
+}
+.love-text, .trash-text { font-size: 17px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+.love-meta, .trash-meta { margin-top: 10px; color: #8a7258; font-size: 12px; line-height: 1.6; }
+.message-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+.talk-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0 6px;
+}
+.talk-page-button {
+  border: 1px solid rgba(120,90,70,.18);
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: rgba(255,255,255,.72);
+  color: #6f5a50;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+}
+.talk-page-button:hover { background: rgba(255,255,255,.92); }
+.talk-page-button:disabled { opacity: .4; cursor: default; }
+.talk-page-number { color: #8a7770; font-size: 12px; min-width: 44px; text-align: center; }
+
+.message-actions button, .book-delete-button, .restore-button, .empty-trash-button {
+  border: 0; border-radius: 999px; padding: 10px 15px; cursor:pointer; font-family:inherit;
+}
+.book-save-button { background:#7d5b45; color:white; border:0; border-radius:999px; padding:10px 16px; cursor:pointer; font-family:inherit; }
+.book-delete-button { background:#ead7d2; color:#694a43; }
+.restore-button { background:#e8dcc7; color:#5f4b36; }
+.empty-trash-button { background:#6b4f4f; color:white; }
+#trash { background:#f7f0ed; border-radius:18px; padding:24px; }
+#trash h2 { margin-top:0; }
+.section-note { color:#8a7770; font-size:14px; line-height:1.6; }
+@media (max-width: 600px) {
+  #love, #book, #trash { margin: 14px 10px; padding: 20px 14px; }
+  .diary-page { padding: 24px 20px; }
+  .diary-message p, .love-text, .trash-text { font-size: 16px; }
+}
+
+
+
+/* Love Mail music send */
+.love-send-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.love-send-row #sendLoveButton{margin:0;}
+.spotify-quick-button{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;min-height:64px;flex:0 0 64px;padding:0;border:0;border-radius:14px;background:#111;text-decoration:none;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.16);overflow:hidden;transition:transform .15s ease,box-shadow .15s ease;}
+.spotify-quick-button:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(0,0,0,.2);}
+.spotify-quick-button:active{transform:translateY(1px);box-shadow:0 2px 6px rgba(0,0,0,.14);}
+.spotify-quick-button img{display:block;width:100%;height:100%;object-fit:cover;border-radius:14px;background:#111;}
+@media (max-width:520px){.love-send-row{flex-direction:row;align-items:center;}.love-send-row #sendLoveButton{flex:1;min-width:0;}.spotify-quick-button{width:56px;height:56px;flex:0 0 56px;border-radius:12px;}.spotify-quick-button img{border-radius:12px;}}
+.love-send-choice{position:relative;display:flex;flex-direction:column;gap:10px;width:min(100%,360px);margin:10px auto 24px;padding:16px;border-radius:20px;background:rgba(255,255,255,.65);border:1px solid rgba(160,105,105,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.love-choice-button{width:100%;min-height:56px;border:1px solid rgba(160,105,105,.2);border-radius:16px;background:rgba(255,250,250,.9);color:#6d4545;font-size:16px;font-weight:700;cursor:pointer;padding:12px 18px;}
+.love-choice-button:hover{transform:translateY(-1px);}
+.love-choice-button .paper-plane{display:inline-block;transform:rotate(-35deg);margin-right:6px;}
+.love-choice-close{position:absolute;top:6px;right:8px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,255,255,.7);color:#6d4545;font-size:20px;line-height:26px;padding:0;cursor:pointer;}
+.spotify-card{margin-top:12px;padding:10px;border-radius:16px;background:rgba(255,255,255,.72);overflow:hidden;}
+.spotify-card iframe{display:block;width:100%;min-height:152px;border:0;border-radius:12px;}
+.spotify-fallback{display:inline-flex;margin-top:10px;align-items:center;justify-content:center;text-decoration:none;}
+
+/* Future Love access */
+
+.future-love-access{position:fixed;right:22px;bottom:22px;z-index:9999;margin:0;}
+.future-love-access #futureLoveButton{width:72px;height:72px;min-height:0;margin:0;padding:10px;border-radius:50%;font-size:11px;line-height:1.15;letter-spacing:0;color:#fff;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.25);box-shadow:0 6px 0 rgba(0,0,0,.35), 0 10px 22px rgba(0,0,0,.22), inset 0 2px 0 rgba(255,255,255,.12);}
+.future-love-access #futureLoveButton:hover{transform:translateY(-2px);background:rgba(0,0,0,.82);box-shadow:0 8px 0 rgba(0,0,0,.4), 0 13px 25px rgba(0,0,0,.25), inset 0 2px 0 rgba(255,255,255,.14);}
+.future-love-access #futureLoveButton:active{transform:translateY(5px);background:rgba(0,0,0,.86);box-shadow:0 1px 0 rgba(0,0,0,.45), 0 5px 10px rgba(0,0,0,.18);}
+.future-love-panel{position:fixed;right:22px;bottom:108px;width:min(360px,calc(100vw - 44px));max-height:70vh;overflow:auto;margin:0;background:rgba(0,0,0,.72);color:#fff;border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}.future-love-panel h3,.future-love-panel p,.future-love-panel div,.future-love-panel span{color:#fff;}
+.future-love-close{position:absolute;top:8px;left:10px;width:32px;height:32px;border:0;border-radius:50%;background:rgba(0,0,0,.10);color:#333;font-size:25px;line-height:28px;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
+.future-love-close:hover{background:rgba(0,0,0,.18);}
+.future-love-panel h3{padding-left:28px;}
+
+.future-love-panel{margin-top:14px;padding:18px;border:1px solid rgba(255,255,255,.22);border-radius:20px;background:rgba(0,0,0,.55);color:#fff;}
+.future-love-card{padding:14px;margin:10px 0;border-radius:16px;background:rgba(255,255,255,.7);}
+.future-love-time{font-weight:700;margin:7px 0;}
+.future-love-cancel{border:0;border-radius:12px;padding:9px 13px;cursor:pointer;}
+
+/* Love Mail send button */
+.love-button {
+  display: block;
+  width: min(100%, 360px);
+  min-height: 72px;
+  margin: 28px auto 30px;
+  padding: 16px 24px;
+  border: 1px solid rgba(160, 105, 105, 0.25);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fffafa 0%, #f4dede 100%);
+  color: #6d4545;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #d7b0b0, 0 13px 22px rgba(100, 55, 55, 0.18), inset 0 2px 0 rgba(255,255,255,0.9);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.love-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 0 #d7b0b0, 0 16px 25px rgba(100, 55, 55, 0.20), inset 0 2px 0 rgba(255,255,255,0.95);
+}
+.love-button:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 #d7b0b0, 0 6px 12px rgba(100, 55, 55, 0.15), inset 0 2px 0 rgba(255,255,255,0.8);
+}
+
+
+/* Paper plane icon */
+.paper-plane {
+  display: inline-block;
+  font-size: 1.35em;
+  transform: rotate(-18deg);
+  margin-right: 8px;
+  text-shadow: 1px 2px 0 rgba(0,0,0,.15);
+}
+
+.future-love-access #futureLoveButton{background:rgba(0,0,0,.58)!important;color:#fff!important;border:1px solid rgba(255,255,255,.28)!important;}
+.future-love-access #futureLoveButton:hover{background:rgba(0,0,0,.68)!important;color:#fff!important;}
+.future-love-panel,.future-love-panel h3,.future-love-panel p,.future-love-panel div,.future-love-panel button{color:#fff;}
+
+/* Requests God access */
+.request-god-access{display:none;position:fixed;right:22px;bottom:22px;z-index:9999;margin:0;}
+.request-god-access #requestGodButton{width:72px;height:72px;min-height:0;margin:0;padding:10px;border-radius:50%;font-size:11px;line-height:1.15;letter-spacing:0;color:#fff;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.28);box-shadow:0 6px 0 rgba(0,0,0,.35),0 10px 22px rgba(0,0,0,.22),inset 0 2px 0 rgba(255,255,255,.12);}
+.request-god-access #requestGodButton:hover{transform:translateY(-2px);background:rgba(0,0,0,.68);color:#fff;}
+.request-god-access #requestGodButton:active{transform:translateY(5px);background:rgba(0,0,0,.8);}
+
+    .archive-photo-picker-button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+    .archive-photo-picker-button:active {
+      transform: translateY(1px);
+    }
+
+
+/* =========================
+   Home — reveal partner world
+========================= */
+.home {
+  position: relative;
+  overflow: hidden;
+  --scene-color: 255,255,255;
+  --scene-alpha: 0;
+  --scene-top: 255,255,255;
+  --scene-bottom: 255,255,255;
+}
+.home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(var(--scene-top), calc(var(--scene-alpha) * .88)), transparent 52%),
+    radial-gradient(circle at 84% 26%, rgba(var(--scene-color), calc(var(--scene-alpha) * .34)), transparent 50%),
+    linear-gradient(180deg, rgba(var(--scene-top), calc(var(--scene-alpha) * .40)), rgba(var(--scene-bottom), var(--scene-alpha)));
+}
+.home-content {
+  position: relative;
+  z-index: 2;
+  width: min(900px, 100%);
+}
+.home-reveal-shell {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: 10px;
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+.home-reveal-copy {
+  position: relative;
+  min-height: 300px;
+  padding: 28px 28px 22px;
+  border-radius: 28px;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}
+.home-reveal-copy[role="slider"] { outline: none; }
+.home-reveal-copy h1 {
+  margin: 0 0 15px;
+  font-size: 42px;
+  font-weight: normal;
+}
+.home-reveal-copy > p {
+  margin: 0 auto;
+  max-width: 540px;
+  font-size: 16px;
+  color: #8a7070;
+  line-height: 1.8;
+}
+.home-reveal-copy::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 26px;
+  border: 1px solid transparent;
+  pointer-events: none;
+  transition: border-color .25s ease, background .25s ease;
+}
+.home-reveal-copy:hover::after {
+  border-color: rgba(110,85,85,.10);
+  background: rgba(255,255,255,.035);
+}
+.home-weather-info {
+  min-height: 105px;
+  margin: 24px auto 0;
+  max-width: 520px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  opacity: 0;
+  transform: translateX(-42px);
+  will-change: opacity, transform;
+}
+.home-weather-main { font-size: 23px; color: #4f3d3d; }
+.home-weather-sub { font-size: 15px; color: #786565; }
+.home-weather-note { font-size: 12px; color: #987e7e; margin-top: 4px; }
+.home-reveal-copy[data-direction="right"] .home-weather-info {
+  transform: translateX(-42px);
+}
+.home-reveal-copy[data-direction="left"] .home-weather-info {
+  transform: translateX(42px);
+}
+.home-arrow {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(110,85,85,.13);
+  background: rgba(255,255,255,.48);
+  color: #725d5d;
+  font-family: Georgia, serif;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(80,55,45,.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform .15s ease, background .15s ease;
+}
+.home-arrow:hover {
+  transform: scale(1.05);
+  background: rgba(255,255,255,.68);
+}
+.home-arrow:active { transform: scale(.97); }
+.home-location-tools {
+  margin-top: 8px;
+  text-align: center;
+  position: relative;
+  z-index: 5;
+}
+.home-location-button {
+  border: 0;
+  background: transparent;
+  color: #8a7070;
+  font-family: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.home-location-panel {
+  display: none;
+  margin: 12px auto 0;
+  padding: 14px;
+  width: min(340px, 100%);
+  border-radius: 18px;
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(120,90,70,.10);
+  box-shadow: 0 10px 24px rgba(80,55,45,.08);
+}
+.home-location-panel.open { display: block; }
+.home-location-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.home-location-row select {
+  min-width: 190px;
+  max-width: 100%;
+  border: 1px solid rgba(120,90,70,.16);
+  border-radius: 12px;
+  padding: 9px 11px;
+  background: rgba(255,255,255,.88);
+  color: #5e4c4c;
+  font-family: inherit;
+}
+.home-location-save {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 14px;
+  background: #6b5757;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  .home-reveal-shell { display: block; }
+  .home-arrow { display: none; }
+  .home-reveal-copy {
+    min-height: 320px;
+    padding: 24px 14px 16px;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  .home-reveal-copy h1 { font-size: 34px; }
+  .home-reveal-copy > p { font-size: 15px; }
+  .home-weather-info { min-height: 100px; }
+}
+
+
+/* =========================
+   Icon Closet
+========================= */
+.icon-closet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+.icon-choice {
+  position: relative;
+  border: 1px solid rgba(110,85,85,.14);
+  border-radius: 22px;
+  padding: 14px;
+  background: rgba(255,255,255,.64);
+  cursor: pointer;
+  font-family: Georgia, serif;
+  color: #5a4848;
+  box-shadow: 0 8px 22px rgba(80,55,45,.07);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.icon-choice:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(80,55,45,.11);
+}
+.icon-choice.selected {
+  border-color: rgba(141,83,105,.45);
+  box-shadow: 0 0 0 3px rgba(239,182,202,.20), 0 12px 26px rgba(80,55,45,.10);
+}
+.icon-choice img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 18px;
+  background: #111;
+}
+.icon-choice-label {
+  display: block;
+  margin-top: 10px;
+  font-size: 15px;
+}
+.icon-choice-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.92);
+  color: #8d5369;
+  font-size: 13px;
+  opacity: 0;
+}
+.icon-choice.selected .icon-choice-check { opacity: 1; }
+.icon-closet-preview {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.52);
+  border: 1px solid rgba(110,85,85,.10);
+}
+.icon-closet-preview img {
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
+  object-fit: cover;
+  background: #111;
+}
+.icon-closet-preview-title { font-size: 17px; }
+.icon-closet-note {
+  margin-top: 8px;
+  color: #8a7070;
+  font-size: 13px;
+  line-height: 1.7;
+}
+@media (max-width: 700px) {
+  .icon-closet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+}
+@media (max-width: 420px) {
+  .icon-closet-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .icon-choice { padding: 10px; border-radius: 18px; }
+  .icon-choice img { border-radius: 14px; }
+}
+
+</style>
+
+</head>
+
+<body>
+
+  <!-- =========================
+       Login
+  ========================== -->
+
+  <div id="loginScreen">
+
+    <div class="login-box">
+
+      <div class="login-kicker">
+        Welcome to
+      </div>
+
+      <h1 class="login-title">
+        Our Little Archive ♡
+      </h1>
+
+      <p class="login-question">
+        Who are you? ♡
+      </p>
+
+      <!-- Shiori -->
+
+      <button
+        class="person-choice shiori"
+        onclick="choosePerson('Shiori')"
+      >
+
+        <img
+  class="avatar"
+  src="./IMG_6564.png"
+  alt="Shiori"
+  style="object-position: center 20%;"
+>
+
+        <span>
+          Shiori
+        </span>
+
+        <span class="choice-arrow">
+          →
+        </span>
+
+      </button>
+
+
+      <!-- Kai -->
+
+      <button
+        class="person-choice kai"
+        onclick="choosePerson('Kai')"
+      >
+
+        <img
+          class="avatar"
+          src="./IMG_6560.png"
+          alt="Kai"
+         style=" object-position: center 25%;"
+        >
+
+        <span>
+          Kai
+        </span>
+
+        <span class="choice-arrow">
+          →
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- Remember popup -->
+
+  <div id="rememberBox">
+
+    <div class="remember-card">
+
+      <h3>
+        Remember you? ♡
+      </h3>
+
+      <p>
+
+        Remember
+        <span id="rememberName"></span>
+        on this device?
+
+        <br>
+
+        You won't be asked again.
+
+      </p>
+
+      <div class="remember-actions">
+
+        <button
+          class="yes-button"
+          onclick="rememberYes()"
+        >
+          Yes ♡
+        </button>
+
+        <button
+          class="no-button"
+          onclick="rememberNo()"
+        >
+          No
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       Main site
+  ========================== -->
+
+  <header>
+
+    <button class="logo" type="button" onclick="goHome()" aria-label="Go to home">
+      Our Little Archive ♡
+    </button>
+
+    <button
+      class="menu-button"
+      onclick="openMenu()"
+      aria-label="Open menu"
+    >
+      ☰
+    </button>
+
+  </header>
+
+
+  <!-- Home -->
+
+  <main
+    id="home"
+    class="home"
+  >
+
+    <div class="home-content">
+
+      <div class="home-reveal-shell" id="homeRevealShell">
+
+        <button
+          type="button"
+          class="home-arrow"
+          id="homeRevealPrev"
+          aria-label="Open or close your love's world from the left"
+        >
+          ‹
+        </button>
+
+        <div
+          id="homeRevealCopy"
+          class="home-reveal-copy"
+          role="slider"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          aria-label="Slide to see your love's local time and weather"
+          tabindex="0"
+        >
+
+          <h1>
+            Our Little Archive ♡
+          </h1>
+
+          <p>
+            A little place for us.
+            <br>
+            For everything we want to remember.
+          </p>
+
+          <div id="homeWeatherInfo" class="home-weather-info" aria-live="polite">
+            <div id="homeWeatherMain" class="home-weather-main">Their world is waiting ♡</div>
+            <div id="homeWeatherSub" class="home-weather-sub">Swipe left to reveal · swipe right to hide.</div>
+            <div id="homeWeatherNote" class="home-weather-note"></div>
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="home-arrow"
+          id="homeRevealNext"
+          aria-label="Open or close your love's world from the right"
+        >
+          ›
+        </button>
+
+      </div>
+
+      <div class="home-location-tools">
+        <button type="button" id="homeLocationButton" class="home-location-button">📍 Choose my city</button>
+        <div id="homeLocationPanel" class="home-location-panel">
+          <div class="home-location-row">
+            <select id="homeLocationSelect" aria-label="Choose your city">
+              <option value="Tokyo">Tokyo</option>
+              <option value="Scotland">Scotland</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Yangon">Yangon</option>
+              <option value="Kuala Lumpur">Kuala Lumpur</option>
+              <option value="Paris">Paris</option>
+              <option value="New York">NewYork</option>
+              <option value="Los Angeles">LosAngeles</option>
+            </select>
+            <button type="button" id="homeLocationSave" class="home-location-save">Save</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- Overlay -->
+
+  <div
+    id="menuOverlay"
+    class="menu-overlay"
+    onclick="closeMenu()"
+  ></div>
+
+
+  <!-- Side menu -->
+
+  <nav
+    id="sideMenu"
+    class="side-menu"
+  >
+
+    <div class="menu-header">
+
+      <div class="menu-title">
+        Menu
+      </div>
+
+      <button
+        class="close-button"
+        onclick="closeMenu()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <button
+      class="menu-item"
+      onclick="showPage('love')"
+    >
+
+      <span>
+        💌
+      </span>
+
+      Love Mail
+
+    </button>
+
+
+    <button
+      class="menu-item"
+      onclick="showPage('talk')"
+    >
+
+      <span>
+        🌱
+      </span>
+
+      Requests
+
+    </button>
+
+
+    <button
+      class="menu-item"
+      onclick="showPage('archive')"
+    >
+
+      <span>
+        📖
+      </span>
+
+      Archive
+
+    </button>
+
+    <button
+      class="menu-item"
+      onclick="showPage('book')"
+    >
+
+      <span>
+        📕
+      </span>
+
+      My Love Diary
+
+    </button>
+
+    <button
+      class="menu-item"
+      onclick="showPage('trash')"
+    >
+
+      <span>
+        🗑️
+      </span>
+
+      Trash
+
+    </button>
+
+    <button
+      class="menu-item"
+      onclick="showPage('iconCloset')"
+    >
+
+      <span>
+        🎀
+      </span>
+
+      Icon Closet
+
+    </button>
+
+  
+    
+    <button class="menu-item" onclick="changePerson()">
+   Log out
+</button>
+
+  </nav>
+
+
+  <!-- Love -->
+
+  <section
+    id="love"
+    class="page"
+  >
+
+    <h2>
+      💌 Love Mail
+    </h2>
+
+    <p class="page-description">
+  Little love messages that have arrived for you.
+</p>
+
+<div class="love-send-row">
+  <button
+    id="sendLoveButton"
+    type="button"
+    class="love-button"
+  >
+    <span class="paper-plane" aria-hidden="true">➤</span> Send a little love
+  </button>
+  <a
+    class="spotify-quick-button"
+    href="https://open.spotify.com/"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Open Spotify"
+  ><img src="assets/spotify.png" alt="Spotify" /></a>
+</div>
+
+<div id="loveSendChoice" class="love-send-choice" style="display:none;">
+  <button type="button" id="loveMessageChoiceButton" class="love-choice-button">
+    <span class="paper-plane" aria-hidden="true">➤</span> Write a message
+  </button>
+  <button type="button" id="loveMusicChoiceButton" class="love-choice-button">
+    🎵 Send music only
+  </button>
+  <button type="button" id="closeLoveSendChoice" class="love-choice-close" aria-label="Close">×</button>
+</div>
+
+
+<div class="future-love-access">
+  <button type="button" id="futureLoveButton" class="love-button" aria-label="Are you God?">Are you<br>God?</button>
+  <div id="futureLovePanel" class="future-love-panel" style="display:none;">
+    <button type="button" id="closeFutureLoveButton" class="future-love-close" aria-label="Close">×</button>
+    <h3>✨ Future Love</h3>
+    <p class="page-description">See when your little love is scheduled to arrive, or cancel it before it arrives.</p>
+    <div id="futureLoveList"></div>
+  </div>
+</div>
+
+<div class="mail-inbox-header">
+  <h3>📥 Love Mail</h3>
+  <p>Messages from your love will appear here ♡</p>
+</div>
+
+<div
+  id="loveInbox"
+  class="love-message"
+></div>
+
+      
+
+  </section>
+  <!-- Requests -->
+
+  <section
+    id="talk"
+    class="page"
+  >
+
+    <h2>
+      🌱 Requests
+    </h2>
+
+    <p class="page-description">
+
+      A place to tell me what you'd like me to change or know.
+
+      <br>
+
+      Check the message when you're ready.
+
+    </p>
+
+    <button
+      id="sendTalkButton"
+      type="button"
+      class="love-button"
+    >
+      <span class="paper-plane" aria-hidden="true">➤</span> Send a message
+    </button>
+
+    <button
+      id="talkReadyButton"
+      type="button"
+      class="love-button"
+    >
+      🌷 I'm ready
+    </button>
+
+    <div class="request-god-access" id="requestGodAccess">
+      <button type="button" id="requestGodButton" class="love-button" aria-label="Are you God?">Are you<br>God?</button>
+    </div>
+
+    <div id="talkInboxWrap" style="display:none;">
+      <div class="mail-inbox-header">
+        <h3>📥 I'm ready</h3>
+        <p>Your messages will appear here ♡</p>
+      </div>
+
+      <div id="talkInbox" class="love-message"></div>
+
+      <div id="talkPagination" class="talk-pagination" style="display:none;">
+        <button type="button" id="talkPrevButton" class="talk-page-button">← Previous</button>
+        <span id="talkPageNumber" class="talk-page-number">1 / 1</span>
+        <button type="button" id="talkNextButton" class="talk-page-button">Next Page →</button>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- Archive -->
+
+  <section
+    id="archive"
+    class="page"
+  >
+
+    <h2>
+      📖 Archive
+    </h2>
+
+    <p class="page-description">
+
+      Our memories, kept here.
+
+    </p>
+   
+
+    <a
+      class="memory-card"
+      href="https://nw2ntmtzzk-spec.github.io/4-month-anniversary/"
+      target="_blank"
+    >
+
+      <div class="memory-date">
+        23 September 2026
+      </div>
+
+      <div class="memory-title">
+        💕 4 Months
+      </div>
+
+      <div class="memory-description">
+        A little website made for us.
+      </div>
+
+    </a>
+
+
+    <div class="archive-photos-section">
+      <div class="archive-photos-header">
+        <div>
+          <h3>📸 Memories</h3>
+          <p class="section-note">Create an album and choose up to three best photos.</p>
+        </div>
+
+        <button type="button" id="createAlbumButton" class="archive-create-button" onclick="window.createArchiveAlbum()">＋ Create Album</button>
+      </div>
+
+      <div id="archivePhotoStatus" class="archive-photo-status" style="display:none;"></div>
+      <div id="archiveAlbumGallery" class="archive-album-grid">
+        <div class="archive-empty">No albums yet ♡</div>
+      </div>
+
+      <div id="archiveUnsortedSection" class="archive-unsorted" style="display:none;">
+        <h4>Photos</h4>
+        <div id="archiveUnsortedGallery" class="archive-unsorted-gallery"></div>
+      </div>
+    </div>
+
+  </section>
+
+ 
+
+
+
+<div id="archivePhotoLightbox" class="archive-photo-lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Photo preview">
+  <button type="button" id="archivePhotoLightboxClose" class="archive-photo-lightbox-close" aria-label="Close">×</button>
+  <img id="archivePhotoLightboxImage" src="" alt="Memory photo preview">
+</div>
+
+<section id="iconCloset" class="page">
+
+  <h2>🎀 Icon Closet</h2>
+
+  <p class="page-description">Choose the icon that feels most like us ♡</p>
+
+  <div class="icon-closet-grid" id="iconClosetGrid" aria-label="Choose an icon">
+    <button type="button" class="icon-choice" data-icon-key="archive" aria-label="Choose うさぎとモモンガ icon" aria-pressed="false">
+      <img src="assets/icon_rabbit_momonga.webp" alt="Our Little Archive icon">
+      <span class="icon-choice-label">うさぎとモモンガ</span>
+      <span class="icon-choice-check" aria-hidden="true">✓</span>
+    </button>
+
+    <button type="button" class="icon-choice" data-icon-key="flame" aria-label="Choose Tinder icon" aria-pressed="false">
+      <img src="assets/icon_tinder.webp" alt="Flame icon">
+      <span class="icon-choice-label">Tinder</span>
+      <span class="icon-choice-check" aria-hidden="true">✓</span>
+    </button>
+
+    <button type="button" class="icon-choice" data-icon-key="midnight" aria-label="Choose 韓国風 icon" aria-pressed="false">
+      <img src="assets/icon_korean.webp" alt="Midnight Archive icon">
+      <span class="icon-choice-label">韓国風</span>
+      <span class="icon-choice-check" aria-hidden="true">✓</span>
+    </button>
+    <button type="button" class="icon-choice" data-icon-key="shiba" aria-label="Choose 柴犬 icon" aria-pressed="false">
+      <img src="assets/icon_shiba.webp" alt="柴犬 icon">
+      <span class="icon-choice-label">柴犬</span>
+      <span class="icon-choice-check" aria-hidden="true">✓</span>
+    </button>
+
+    <button type="button" class="icon-choice" data-icon-key="samurai" aria-label="Choose 侍 icon" aria-pressed="false">
+      <img src="assets/icon_samurai.webp" alt="侍 icon">
+      <span class="icon-choice-label">侍</span>
+      <span class="icon-choice-check" aria-hidden="true">✓</span>
+    </button>
+  </div>
+
+  <div class="icon-closet-preview">
+    <img id="iconClosetPreview" src="assets/icon_rabbit_momonga.webp" alt="Selected icon preview">
+    <div>
+      <div class="icon-closet-preview-title" id="iconClosetSelectedName">Archive</div>
+      <div class="icon-closet-note">Choose an icon first, then add the site to your iPhone Home Screen from Safari. The selected icon is used for new Home Screen additions.</div>
+    </div>
+  </div>
+
+</section>
+
+<section id="trash" class="page">
+
+  <h2>🗑️ Trash</h2>
+
+  <p class="section-note">Messages removed from your Diary stay here until you permanently delete or restore them.</p>
+
+  <div id="trashMessages">
+    <div class="coming-soon">Your deleted little loves will live here ♡</div>
+  </div>
+
+</section>
+
+
+<section id="book" class="page">
+
+  <h2>📕 My Love Diary</h2>
+
+  <p class="page-description">
+
+    Little words I wanted to keep forever.
+
+  </p>
+
+  <div id="bookMessages">
+
+    <div class="coming-soon">
+
+      Your little loves will live here ♡
+
+    </div>
+
+  </div>
+
+</section>
+  <!-- =========================
+       JavaScript
+  ========================== -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  doc,
+  updateDoc,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+/* =========================
+   Firebase
+========================= */
+
+const firebaseConfig = {
+  apiKey:"AIzaSyBr9uRT10xfMtoNMUYTQHYDdJSQijYC-9U",
+  authDomain: "our-little-archive-efcff.firebaseapp.com",
+  projectId:  "our-little-archive-efcff",
+  storageBucket:"our-little-archive-efcff.firebasestorage.app",
+  messagingSenderId: "640336756001",
+  appId: "1:640336756001:web:40f3f6f4c863d2ed561260"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+console.log("Firebase connected ♡");
+
+
+/* =========================
+   Login
+========================= */
+
+let selectedPerson = null;
+
+
+window.addEventListener(
+  "DOMContentLoaded",
+  function () {
+
+    const savedPerson =
+      localStorage.getItem("archivePerson");
+
+    if (
+      savedPerson === "Shiori" ||
+      savedPerson === "Kai"
+    ) {
+      enterArchive(savedPerson);
+    }
+
+  }
+);
+
+
+window.choosePerson = function(person) {
+
+  selectedPerson = person;
+
+  document
+    .getElementById("rememberName")
+    .textContent = person;
+
+  document
+    .getElementById("rememberBox")
+    .style.display = "flex";
+
+};
+
+
+window.rememberYes = function() {
+
+  localStorage.setItem(
+    "archivePerson",
+    selectedPerson
+  );
+
+  enterArchive(selectedPerson);
+
+};
+
+
+window.rememberNo = function() {
+
+  localStorage.removeItem(
+    "archivePerson"
+  );
+
+  enterArchive(selectedPerson);
+
+};
+
+
+function enterArchive(person) {
+
+  document
+    .getElementById("loginScreen")
+    .style.display = "none";
+
+  document
+    .getElementById("rememberBox")
+    .style.display = "none";
+
+  document.body.dataset.person = person;
+  loadMyChosenCity();
+  loadPartnerWeather();
+
+}
+
+
+/* =========================
+   Archive Albums & Photos
+========================= */
+
+function sanitizeArchiveText(value) {
+  return String(value || "").replace(/[<>]/g, "");
+}
+
+async function loadArchiveAlbums() {
+  const gallery = document.getElementById("archiveAlbumGallery");
+  const unsortedSection = document.getElementById("archiveUnsortedSection");
+  const unsortedGallery = document.getElementById("archiveUnsortedGallery");
+  if (!gallery) return;
+
+  try {
+    const albumSnapshot = await getDocs(collection(db, "archiveAlbums"));
+    const albums = [];
+
+    albumSnapshot.forEach(function(snap) {
+      const data = snap.data() || {};
+      albums.push({ id: snap.id, ...data });
+    });
+
+    albums.sort(function(a, b) {
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
+
+    if (!albums.length) {
+      gallery.innerHTML = '<div class="archive-empty">No albums yet ♡</div>';
+    } else {
+      gallery.innerHTML = albums.map(function(album) {
+        const albumPhotos = Array.isArray(album.photos) ? album.photos.slice(0, 3) : [];
+        const count = albumPhotos.length;
+        const remaining = Math.max(0, 3 - count);
+        const title = sanitizeArchiveText(album.name || "Untitled album");
+        const addedBy = sanitizeArchiveText(album.createdBy || "Us");
+
+        const photoHtml = albumPhotos.map(function(photo, photoIndex) {
+          const name = sanitizeArchiveText(photo.name || "Photo");
+          const src = photo.url || "";
+          return `
+            <div class="archive-photo-card">
+              <div class="archive-photo-wrap">
+                <button type="button" class="archive-photo-open" data-photo-open="${album.id}" data-photo-index="${photoIndex}" aria-label="Open ${name}">
+                  <img src="${src}" alt="${name}">
+                </button>
+                <button type="button" class="archive-photo-delete-button" data-photo-delete="${album.id}" data-photo-index="${photoIndex}" aria-label="Delete photo">×</button>
+              </div>
+              <div class="archive-photo-meta">
+                <button type="button" class="archive-photo-title-button" data-photo-title="${album.id}" data-photo-index="${photoIndex}" aria-label="Edit photo title">♡ ${sanitizeArchiveText(photo.title || "Memory")}</button>
+                <div>Added by ${sanitizeArchiveText(photo.addedBy || addedBy)}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        const inputId = "archiveAlbumInput_" + album.id;
+        const addButton = remaining > 0
+          ? `
+            <div class="archive-album-add-row">
+              <button type="button" class="archive-upload-button archive-photo-picker-button" data-photo-picker="${album.id}">📷 Choose from Photos</button>
+              <input id="${inputId}" type="file" accept="image/*" multiple hidden data-album-id="${album.id}">
+              <div class="archive-mobile-hint">Choose up to ${remaining} photo${remaining === 1 ? "" : "s"} from your phone ♡</div>
+            </div>
+          `
+          : `
+            <div class="archive-album-count">This album is full ♡</div>
+          `;
+
+        return `
+          <div class="archive-album-card" data-archive-card-id="${album.id}" tabindex="0">
+            <div class="archive-album-head">
+              <h4 class="archive-album-title">${title}</h4>
+              <div class="archive-album-head-actions">
+                <div class="archive-album-count">${count} / 3 photos</div>
+                <button type="button" class="archive-album-delete-button" data-album-delete="${album.id}">🗑️ Delete</button>
+              </div>
+            </div>
+            <div class="archive-album-photos">
+              ${photoHtml || '<div class="archive-empty" style="grid-column:1/-1;padding:18px 6px;">Add up to three photos ♡</div>'}
+            </div>
+            ${addButton}
+          </div>
+        `;
+      }).join("");
+    }
+
+    if (unsortedSection && unsortedGallery) {
+      unsortedSection.style.display = "none";
+      unsortedGallery.innerHTML = "";
+    }
+
+    document.querySelectorAll('[data-photo-picker]').forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        event.preventDefault();
+        const albumId = event.currentTarget.dataset.photoPicker;
+        const input = document.querySelector('input[data-album-id="' + albumId + '"]');
+        if (input) input.click();
+      });
+    });
+
+    document.querySelectorAll('input[data-album-id]').forEach(function(input) {
+      input.addEventListener("change", function(event) {
+        const files = event.target && event.target.files ? Array.from(event.target.files) : [];
+        if (!files.length) return;
+        uploadArchiveAlbumPhotos(event.target.dataset.albumId, files);
+        event.target.value = "";
+      });
+    });
+
+    document.querySelectorAll('.archive-album-card').forEach(function(card) {
+      card.addEventListener("paste", function(event) {
+        const items = event.clipboardData ? Array.from(event.clipboardData.items || []) : [];
+        const imageFiles = items
+          .filter(function(item) { return item.type && item.type.startsWith("image/"); })
+          .map(function(item) { return item.getAsFile(); })
+          .filter(Boolean);
+
+        if (!imageFiles.length) return;
+        event.preventDefault();
+        const input = card.querySelector('input[data-album-id]');
+        if (input) uploadArchiveAlbumPhotos(input.dataset.albumId, imageFiles);
+      });
+    });
+
+    document.querySelectorAll('[data-album-delete]').forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        deleteArchiveAlbum(event.currentTarget.dataset.albumDelete);
+      });
+    });
+
+    document.querySelectorAll('[data-photo-delete]').forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        deleteArchiveAlbumPhoto(
+          event.currentTarget.dataset.photoDelete,
+          Number(event.currentTarget.dataset.photoIndex)
+        );
+      });
+    });
+
+    document.querySelectorAll('[data-photo-open]').forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        openArchivePhoto(
+          event.currentTarget.dataset.photoOpen,
+          Number(event.currentTarget.dataset.photoIndex)
+        );
+      });
+    });
+
+    document.querySelectorAll('[data-photo-title]').forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        editArchivePhotoTitle(
+          event.currentTarget.dataset.photoTitle,
+          Number(event.currentTarget.dataset.photoIndex)
+        );
+      });
+    });
+  } catch (error) {
+    console.error("Archive album load error:", error);
+    gallery.innerHTML = '<div class="archive-empty">Could not load your albums ♡</div>';
+  }
+}
+
+function openArchivePhoto(albumId, photoIndex) {
+  const lightbox = document.getElementById("archivePhotoLightbox");
+  const image = document.getElementById("archivePhotoLightboxImage");
+  if (!lightbox || !image) return;
+
+  getDoc(doc(db, "archiveAlbums", albumId)).then(function(snap) {
+    if (!snap.exists()) return;
+    const photos = Array.isArray(snap.data()?.photos) ? snap.data().photos : [];
+    const photo = photos[photoIndex];
+    if (!photo || !photo.url) return;
+    image.src = photo.url;
+    image.alt = photo.name || "Memory photo";
+    lightbox.classList.add("open");
+    lightbox.setAttribute("aria-hidden", "false");
+  }).catch(function(error) {
+    console.error("Archive photo open error:", error);
+  });
+}
+
+async function editArchivePhotoTitle(albumId, photoIndex) {
+  if (!albumId || Number.isNaN(photoIndex)) return;
+
+  try {
+    const albumRef = doc(db, "archiveAlbums", albumId);
+    const snap = await getDoc(albumRef);
+    if (!snap.exists()) {
+      alert("This album could not be found ♡");
+      return;
+    }
+
+    const album = snap.data() || {};
+    const photos = Array.isArray(album.photos) ? album.photos.slice(0, 3) : [];
+    const photo = photos[photoIndex];
+    if (!photo) {
+      alert("This photo could not be found ♡");
+      return;
+    }
+
+    const currentTitle = String(photo.title || "Memory");
+    const nextTitle = prompt("Photo title ♡", currentTitle);
+    if (nextTitle === null) return;
+
+    const cleanTitle = nextTitle.trim() || "Memory";
+    photos[photoIndex] = { ...photo, title: cleanTitle };
+
+    await updateDoc(albumRef, {
+      photos: photos,
+      updatedAt: Date.now()
+    });
+
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive photo title error:", error);
+    alert(
+      "The photo title could not be changed ♡\n\n" +
+      (error?.code || "unknown-error") + "\n" +
+      (error?.message || "")
+    );
+  }
+}
+
+window.editArchivePhotoTitle = editArchivePhotoTitle;
+
+async function deleteArchiveAlbumPhoto(albumId, photoIndex) {
+  if (!albumId || Number.isNaN(photoIndex)) return;
+  if (!confirm("Delete this photo from the album? ♡")) return;
+
+  try {
+    const albumRef = doc(db, "archiveAlbums", albumId);
+    const snap = await getDoc(albumRef);
+    if (!snap.exists()) {
+      alert("This album could not be found ♡");
+      return;
+    }
+    const album = snap.data() || {};
+    const photos = Array.isArray(album.photos) ? album.photos.slice(0, 3) : [];
+    if (!photos[photoIndex]) {
+      alert("This photo could not be found ♡");
+      return;
+    }
+    photos.splice(photoIndex, 1);
+    await updateDoc(albumRef, { photos: photos, updatedAt: Date.now() });
+    closeArchivePhotoLightbox();
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive photo delete error:", error);
+    alert("The photo could not be deleted ♡\n\n" + (error?.code || "unknown-error") + "\n" + (error?.message || ""));
+  }
+}
+
+function closeArchivePhotoLightbox() {
+  const lightbox = document.getElementById("archivePhotoLightbox");
+  const image = document.getElementById("archivePhotoLightboxImage");
+  if (!lightbox) return;
+  lightbox.classList.remove("open");
+  lightbox.setAttribute("aria-hidden", "true");
+  if (image) image.src = "";
+}
+
+document.addEventListener("click", function(event) {
+  if (event.target && event.target.id === "archivePhotoLightbox") {
+    closeArchivePhotoLightbox();
+  }
+});
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") closeArchivePhotoLightbox();
+});
+
+document.addEventListener("click", function(event) {
+  if (event.target && event.target.id === "archivePhotoLightboxClose") {
+    closeArchivePhotoLightbox();
+  }
+});
+
+async function deleteArchiveAlbum(albumId) {
+  if (!albumId) return;
+
+  const confirmed = confirm("Delete this album and its photos? ♡");
+  if (!confirmed) return;
+
+  try {
+    await deleteDoc(doc(db, "archiveAlbums", albumId));
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive album delete error:", error);
+    alert(
+      "The album could not be deleted ♡\n\n" +
+      (error?.code || "unknown-error") + "\n" +
+      (error?.message || "")
+    );
+  }
+}
+
+window.deleteArchiveAlbum = deleteArchiveAlbum;
+
+async function createArchiveAlbum() {
+  const name = prompt("Album name ♡");
+  if (name === null) return;
+
+  const cleanName = name.trim();
+  if (!cleanName) {
+    alert("Please enter an album name ♡");
+    return;
+  }
+
+  const person = document.body.dataset.person || "Us";
+
+  try {
+    await addDoc(collection(db, "archiveAlbums"), {
+      name: cleanName,
+      createdBy: person,
+      createdAt: Date.now(),
+      photos: []
+    });
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive album create error:", error);
+    alert(
+      "The album could not be created ♡\n\n" +
+      (error?.code || "unknown-error") + "\n" +
+      (error?.message || "")
+    );
+  }
+}
+
+window.createArchiveAlbum = createArchiveAlbum;
+
+
+function compressArchivePhoto(file, maxDimension = 1200, quality = 0.58) {
+  return new Promise(function(resolve, reject) {
+    if (!file || typeof file !== "object") {
+      reject(new Error("No photo was selected."));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function() {
+      const source = reader.result;
+      try {
+        let width = 0;
+        let height = 0;
+        let drawSource = null;
+        let revokeUrl = null;
+
+        if (typeof createImageBitmap === "function") {
+          try {
+            const bitmap = await createImageBitmap(file);
+            width = bitmap.width;
+            height = bitmap.height;
+            drawSource = bitmap;
+          } catch (bitmapError) {
+            // Fall back to an Image element below.
+          }
+        }
+
+        if (!drawSource) {
+          const image = new Image();
+          image.decoding = "async";
+          image.src = source;
+          await new Promise(function(res, rej) {
+            image.onload = res;
+            image.onerror = function() { rej(new Error("This photo format is not supported by the browser.")); };
+          });
+          width = image.naturalWidth;
+          height = image.naturalHeight;
+          drawSource = image;
+        }
+
+        if (!width || !height) throw new Error("This photo could not be read.");
+
+        const scale = Math.min(1, maxDimension / Math.max(width, height));
+        const outWidth = Math.max(1, Math.round(width * scale));
+        const outHeight = Math.max(1, Math.round(height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = outWidth;
+        canvas.height = outHeight;
+        const ctx = canvas.getContext("2d", { alpha: false });
+        if (!ctx) throw new Error("Your browser could not prepare this photo.");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, outWidth, outHeight);
+        ctx.drawImage(drawSource, 0, 0, outWidth, outHeight);
+
+        let dataUrl = canvas.toDataURL("image/jpeg", quality);
+        for (const q of [0.48, 0.38, 0.30]) {
+          if (dataUrl.length <= 220000) break;
+          dataUrl = canvas.toDataURL("image/jpeg", q);
+        }
+
+        if (dataUrl.length > 220000) {
+          canvas.width = Math.max(1, Math.round(outWidth * 0.78));
+          canvas.height = Math.max(1, Math.round(outHeight * 0.78));
+          ctx.drawImage(drawSource, 0, 0, canvas.width, canvas.height);
+          dataUrl = canvas.toDataURL("image/jpeg", 0.34);
+        }
+
+        if (dataUrl.length > 230000) {
+          throw new Error("This photo is still too large. Please choose another photo.");
+        }
+
+        if (drawSource && typeof drawSource.close === "function") drawSource.close();
+        if (revokeUrl) URL.revokeObjectURL(revokeUrl);
+        resolve(dataUrl);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    reader.onerror = function() { reject(new Error("This photo could not be loaded.")); };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadArchiveAlbumPhotos(albumId, files) {
+  const status = document.getElementById("archivePhotoStatus");
+  if (!albumId || !files || !files.length) return;
+
+  try {
+    const albumRef = doc(db, "archiveAlbums", albumId);
+    const albumSnap = await getDoc(albumRef);
+
+    if (!albumSnap.exists()) {
+      alert("This album could not be found ♡");
+      return;
+    }
+
+    const album = albumSnap.data() || {};
+    const currentPhotos = Array.isArray(album.photos) ? album.photos.slice(0, 3) : [];
+    const remaining = 3 - currentPhotos.length;
+
+    const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "bmp", "tif", "tiff"];
+    const imageFiles = Array.from(files).filter(function(file) {
+      const mimeIsImage = !!(file.type && file.type.toLowerCase().startsWith("image/"));
+      const fileName = String(file.name || "").toLowerCase();
+      const extension = fileName.includes(".") ? fileName.split(".").pop() : "";
+      const extensionIsImage = imageExtensions.includes(extension);
+      return mimeIsImage || extensionIsImage;
+    });
+
+    if (!imageFiles.length) {
+      alert("Please choose a photo from your Photos ♡");
+      return;
+    }
+
+    if (remaining <= 0) {
+      alert("This album already has three photos ♡");
+      return;
+    }
+
+    if (imageFiles.length > remaining) {
+      alert(`This album can only have ${remaining} more photo${remaining === 1 ? "" : "s"} ♡`);
+      return;
+    }
+
+    const person = document.body.dataset.person || "Us";
+    if (status) {
+      status.style.display = "block";
+      status.textContent = `Adding ${imageFiles.length} photo${imageFiles.length === 1 ? "" : "s"}… ♡`;
+    }
+
+    const newPhotos = [];
+    for (const file of imageFiles) {
+      const dataUrl = await compressArchivePhoto(file);
+      newPhotos.push({
+        url: dataUrl,
+        name: file.name,
+        title: "Memory",
+        addedBy: person,
+        createdAt: Date.now()
+      });
+    }
+
+    await updateDoc(albumRef, {
+      photos: currentPhotos.concat(newPhotos).slice(0, 3),
+      updatedAt: Date.now()
+    });
+
+    if (status) status.textContent = "Photos added to the album ♡";
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive photo upload error:", error);
+    if (status) status.textContent = "Photo upload failed ♡";
+    alert(
+      "The photos could not be added ♡\n\n" +
+      (error?.code || "unknown-error") + "\n" +
+      (error?.message || "")
+    );
+  } finally {
+    setTimeout(function() {
+      if (status) status.style.display = "none";
+    }, 2500);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  const createButton = document.getElementById("createAlbumButton");
+  if (createButton) {
+    createButton.addEventListener("click", createArchiveAlbum);
+  }
+  initHomeRevealSlider();
+});
+
+
+
+/* =========================
+   Home — partner place, time & weather
+========================= */
+const PRESENCE_LOCATIONS = {
+  "Tokyo": { latitude: 35.6762, longitude: 139.6503 },
+  "Scotland": { latitude: 55.9533, longitude: -3.1883 },
+  "Singapore": { latitude: 1.3521, longitude: 103.8198 },
+  "Yangon": { latitude: 16.8409, longitude: 96.1735 },
+  "Kuala Lumpur": { latitude: 3.1390, longitude: 101.6869 },
+  "Paris": { latitude: 48.8566, longitude: 2.3522 },
+  "New York": { latitude: 40.7128, longitude: -74.0060 },
+  "Los Angeles": { latitude: 34.0522, longitude: -118.2437 },
+  /* legacy saved locations, kept readable for existing data */
+  "London": { latitude: 51.5072, longitude: -0.1276 },
+  "Osaka": { latitude: 34.6937, longitude: 135.5023 },
+  "Seoul": { latitude: 37.5665, longitude: 126.9780 },
+  "Sydney": { latitude: -33.8688, longitude: 151.2093 }
+};
+
+const WEATHER_INFO = [
+  { max: 0, icon: "☀️", label: "Clear", color: "255,205,120" },
+  { max: 3, icon: "🌤️", label: "Cloudy", color: "205,213,236" },
+  { max: 48, icon: "🌫️", label: "Foggy", color: "184,190,198" },
+  { max: 57, icon: "🌦️", label: "Drizzle", color: "175,201,220" },
+  { max: 67, icon: "🌧️", label: "Rain", color: "125,153,190" },
+  { max: 77, icon: "❄️", label: "Snow", color: "206,221,238" },
+  { max: 82, icon: "🌧️", label: "Showers", color: "112,144,184" },
+  { max: 86, icon: "🌨️", label: "Snow showers", color: "191,213,232" },
+  { max: 99, icon: "⛈️", label: "Storm", color: "110,102,147" }
+];
+
+function weatherDetails(code) {
+  return WEATHER_INFO.find(item => code <= item.max) || WEATHER_INFO[WEATHER_INFO.length - 1];
+}
+
+function localTimeFromApi(timeString) {
+  if (!timeString || !timeString.includes("T")) return "--:--";
+  return timeString.split("T")[1].slice(0, 5);
+}
+
+function partnerName() {
+  return document.body.dataset.person === "Kai" ? "Shiori" : "Kai";
+}
+
+function applyHomeReveal(progress, direction) {
+  const home = document.getElementById("home");
+  const copy = document.getElementById("homeRevealCopy");
+  const info = document.getElementById("homeWeatherInfo");
+  if (!home || !copy || !info) return;
+
+  const p = Math.max(0, Math.min(1, progress));
+  const dir = direction || copy.dataset.direction || "right";
+  copy.dataset.direction = dir;
+  copy.setAttribute("aria-valuenow", String(Math.round(p * 100)));
+
+  const state = window.partnerWeatherState;
+
+  // The same state can be opened/closed from either side.
+  // "left" means the content travels to/from the left.
+  // "right" means the content travels to/from the right.
+  const x = dir === "left" ? -42 * (1 - p) : 42 * (1 - p);
+
+  info.style.opacity = String(Math.min(1, p * 1.18));
+  info.style.transform = `translateX(${x}px) translateY(${10 - p * 10}px)`;
+
+  if (state) {
+    const alpha = 0.72 * p;
+    home.style.setProperty("--scene-color", state.color);
+    home.style.setProperty("--scene-top", state.topColor || state.color);
+    home.style.setProperty("--scene-bottom", state.bottomColor || state.color);
+    home.style.setProperty("--scene-alpha", String(alpha));
+  } else {
+    home.style.setProperty("--scene-alpha", String(0.08 * p));
+  }
+}
+
+async function loadMyChosenCity() {
+  const person = document.body.dataset.person;
+  const select = document.getElementById("homeLocationSelect");
+  if (!person || !select) return;
+  try {
+    const snap = await getDoc(doc(db, "presenceSettings", person));
+    if (snap.exists() && PRESENCE_LOCATIONS[snap.data().city]) {
+      select.value = snap.data().city;
+    }
+  } catch (error) {
+    console.error("Load my city error:", error);
+  }
+}
+
+async function loadPartnerWeather() {
+  const main = document.getElementById("homeWeatherMain");
+  const sub = document.getElementById("homeWeatherSub");
+  const note = document.getElementById("homeWeatherNote");
+  if (!main || !sub || !note) return;
+
+  const partner = partnerName();
+  try {
+    const snap = await getDoc(doc(db, "presenceSettings", partner));
+    if (!snap.exists()) {
+      main.textContent = `${partner}'s place is waiting ♡`;
+      sub.textContent = "They can choose a city from their Home screen.";
+      note.textContent = "Only the city you choose is shared.";
+      window.partnerWeatherState = null;
+      applyHomeReveal(0);
+      return;
+    }
+
+    const city = snap.data().city;
+    const loc = PRESENCE_LOCATIONS[city];
+    if (!loc) {
+      main.textContent = `${partner}'s place is waiting ♡`;
+      sub.textContent = "They can choose a city from their Home screen.";
+      note.textContent = "Only the city you choose is shared.";
+      return;
+    }
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weather_code,is_day&timezone=auto`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Weather request failed");
+    const weather = await response.json();
+    const current = weather.current || {};
+    const details = weatherDetails(Number(current.weather_code));
+    const isDay = Number(current.is_day) === 1;
+    const time = localTimeFromApi(current.time);
+    const tempNumber = Number(current.temperature_2m);
+    const temp = Number.isFinite(tempNumber) ? `${Math.round(tempNumber)}°C` : "--°C";
+    let color = details.color;
+    let topColor = details.color;
+    let bottomColor = details.color;
+
+    if (!isDay) {
+      color = "52,61,97";
+      topColor = "44,52,84";
+      bottomColor = "20,25,48";
+    } else if (details.label === "Clear") {
+      topColor = "255,220,156";
+      bottomColor = "250,236,205";
+    } else if (details.label === "Rain" || details.label === "Showers" || details.label === "Drizzle") {
+      topColor = "146,171,199";
+      bottomColor = "83,111,145";
+    } else if (details.label === "Snow" || details.label === "Snow showers") {
+      topColor = "228,238,248";
+      bottomColor = "191,211,229";
+    } else if (details.label === "Storm") {
+      topColor = "126,117,160";
+      bottomColor = "70,64,106";
+    } else if (details.label === "Foggy") {
+      topColor = "204,208,212";
+      bottomColor = "164,171,179";
+    } else {
+      topColor = "204,214,235";
+      bottomColor = "145,160,184";
+    }
+
+    window.partnerWeatherState = { city, color, topColor, bottomColor, isDay, icon: details.icon, label: details.label, time, temp };
+    main.textContent = `${details.icon} ${partner} · ${city}`;
+    sub.textContent = `${time} · ${details.label} · ${temp}`;
+    note.textContent = isDay ? "It’s daytime there ♡" : "It’s nighttime there ♡";
+    document.getElementById("home").style.setProperty("--scene-color", color);
+    applyHomeReveal(0);
+  } catch (error) {
+    console.error("Partner weather error:", error);
+    main.textContent = "The weather is hiding for a moment ♡";
+    sub.textContent = "Try again in a little while.";
+    note.textContent = "";
+    window.partnerWeatherState = null;
+    applyHomeReveal(0);
+  }
+}
+
+async function saveMyChosenCity(city) {
+  const person = document.body.dataset.person;
+  const loc = PRESENCE_LOCATIONS[city];
+  if (!person || !loc) return;
+
+  try {
+    await setDoc(doc(db, "presenceSettings", person), {
+      person,
+      city,
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      updatedAt: Date.now()
+    }, { merge: true });
+
+    const panel = document.getElementById("homeLocationPanel");
+    if (panel) panel.classList.remove("open");
+    await loadPartnerWeather();
+    alert("Your city was saved ♡");
+  } catch (error) {
+    console.error("Save city error:", error);
+    alert("Could not save your city ♡\n\n" + (error?.code || "unknown-error"));
+  }
+}
+
+function initHomeRevealSlider() {
+  const copy = document.getElementById("homeRevealCopy");
+  const prev = document.getElementById("homeRevealPrev");
+  const next = document.getElementById("homeRevealNext");
+  const locationButton = document.getElementById("homeLocationButton");
+  const locationPanel = document.getElementById("homeLocationPanel");
+  const select = document.getElementById("homeLocationSelect");
+  const save = document.getElementById("homeLocationSave");
+  if (!copy) return;
+
+  let progress = 0;
+  let dragging = false;
+  let startX = 0;
+  let startProgress = 0;
+  let animationFrame = null;
+
+  const setProgress = (value, direction) => {
+    progress = Math.max(0, Math.min(1, value));
+    applyHomeReveal(progress, direction);
+  };
+
+  // One click always toggles the state. The side of the clicked button
+  // controls only the travel direction.
+  const animateTo = (target, direction) => {
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+
+    const start = progress;
+    const end = Math.max(0, Math.min(1, target));
+    const duration = 850;
+    const startTime = performance.now();
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+    const step = (now) => {
+      const raw = Math.min(1, (now - startTime) / duration);
+      const eased = ease(raw);
+      progress = start + (end - start) * eased;
+      applyHomeReveal(progress, direction);
+
+      if (raw < 1) {
+        animationFrame = requestAnimationFrame(step);
+      } else {
+        animationFrame = null;
+      }
+    };
+
+    animationFrame = requestAnimationFrame(step);
+  };
+
+  // Each side controls the direction. When hidden, the information
+  // enters from the side that was clicked. When visible, it exits
+  // through the opposite side so the motion matches the user's action.
+  const toggleByButtonSide = (side) => {
+    const opening = progress < 0.5;
+    const target = opening ? 1 : 0;
+    const direction = opening
+      ? side
+      : (side === "left" ? "right" : "left");
+    animateTo(target, direction);
+  };
+
+  if (prev) {
+    prev.addEventListener("click", function() {
+      if (isMobile()) return;
+      toggleByButtonSide("left");
+    });
+  }
+
+  if (next) {
+    next.addEventListener("click", function() {
+      if (isMobile()) return;
+      toggleByButtonSide("right");
+    });
+  }
+
+  // PC text clicks use the same side-based behavior as the arrows.
+  copy.addEventListener("click", function(event) {
+    if (isMobile()) return;
+    const rect = copy.getBoundingClientRect();
+    const clickedRightHalf = (event.clientX - rect.left) > (rect.width / 2);
+    toggleByButtonSide(clickedRightHalf ? "right" : "left");
+  });
+
+  copy.addEventListener("keydown", function(event) {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      toggleByButtonSide("right");
+    }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      toggleByButtonSide("left");
+    }
+  });
+
+  const mobileQuery = window.matchMedia("(max-width: 600px)");
+  const isMobile = () => mobileQuery.matches;
+
+  copy.addEventListener("pointerdown", function(event) {
+    if (!isMobile()) return;
+    dragging = true;
+    startX = event.clientX;
+    startProgress = progress;
+    copy.setPointerCapture?.(event.pointerId);
+    event.preventDefault();
+  });
+
+  copy.addEventListener("pointermove", function(event) {
+    if (!dragging || !isMobile()) return;
+    const distance = event.clientX - startX;
+    const direction = distance >= 0 ? "right" : "left";
+    const travel = 120;
+    const nextProgress = startProgress - distance / travel;
+    setProgress(nextProgress, direction);
+  });
+
+  const finishSwipe = function(event) {
+    if (!dragging) return;
+    dragging = false;
+    if (event && copy.hasPointerCapture?.(event.pointerId)) {
+      try { copy.releasePointerCapture(event.pointerId); } catch (_) {}
+    }
+
+    const distance = event ? (event.clientX - startX) : 0;
+    const threshold = 24;
+
+    if (Math.abs(distance) >= threshold) {
+      const opening = startProgress < 0.5;
+      // Hidden: either swipe reveals from the side you swipe toward.
+      // Visible: right swipe (left → right) hides to the left;
+      //          left swipe (right → left) hides to the right.
+      const direction = opening
+        ? (distance >= 0 ? "right" : "left")
+        : (distance >= 0 ? "left" : "right");
+      const target = opening ? 1 : 0;
+      animateTo(target, direction);
+    } else {
+      animateTo(startProgress, distance >= 0 ? "right" : "left");
+    }
+  };
+
+  copy.addEventListener("pointerup", finishSwipe);
+  copy.addEventListener("pointercancel", finishSwipe);
+
+  if (locationButton && locationPanel) {
+    locationButton.addEventListener("click", function() {
+      locationPanel.classList.toggle("open");
+    });
+  }
+
+  if (save && select) {
+    save.addEventListener("click", function() {
+      saveMyChosenCity(select.value);
+    });
+  }
+
+  setProgress(0, "right");
+}
+
+window.openMenu = function() {
+
+  document
+    .getElementById("sideMenu")
+    .classList.add("open");
+
+  document
+    .getElementById("menuOverlay")
+    .classList.add("open");
+
+};
+
+
+window.closeMenu = function() {
+
+  document
+    .getElementById("sideMenu")
+    .classList.remove("open");
+
+  document
+    .getElementById("menuOverlay")
+    .classList.remove("open");
+
+};
+
+
+window.changePerson = function() {
+
+  localStorage.removeItem("archivePerson");
+
+  location.reload();
+
+};
+
+
+
+/* =========================
+   Icon Closet
+========================= */
+const ICON_CLOSET = {
+  archive: 'assets/icon_rabbit_momonga.webp',
+  flame: 'assets/icon_tinder.webp',
+  midnight: 'assets/icon_korean.webp'
+},
+  shiba: 'assets/icon_shiba.webp',
+  samurai: 'assets/icon_samurai.webp'
+}
+const ICON_CLOSET_NAMES = {
+  archive: "うさぎとモモンガ",
+  flame: "Tinder",
+  midnight: "韓国風",
+  shiba: "柴犬",
+  samurai: "侍"
+};
+
+function applySelectedIcon(key) {
+  const icon = ICON_CLOSET[key] || ICON_CLOSET.archive;
+  const favicon = document.getElementById("dynamicFavicon");
+  const appleIcon = document.getElementById("dynamicAppleTouchIcon");
+  if (favicon) favicon.href = icon;
+  if (appleIcon) appleIcon.href = icon;
+
+  const preview = document.getElementById("iconClosetPreview");
+  const name = document.getElementById("iconClosetSelectedName");
+  if (preview) preview.src = icon;
+  if (name) name.textContent = ICON_CLOSET_NAMES[key] || "Archive";
+
+  document.querySelectorAll(".icon-choice").forEach(function(button) {
+    const selected = button.dataset.iconKey === key;
+    button.classList.toggle("selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+}
+
+function initIconCloset() {
+  let selected = localStorage.getItem("archiveIconKey") || "archive";
+  if (!ICON_CLOSET[selected]) selected = "archive";
+  applySelectedIcon(selected);
+
+  document.querySelectorAll(".icon-choice").forEach(function(button) {
+    button.addEventListener("click", function() {
+      const key = button.dataset.iconKey;
+      if (!ICON_CLOSET[key]) return;
+      localStorage.setItem("archiveIconKey", key);
+      applySelectedIcon(key);
+    });
+  });
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  initIconCloset();
+});
+
+/* =========================
+   Pages
+========================= */
+
+window.goHome = function() {
+  document.querySelectorAll(".page").forEach(function(page) {
+    page.classList.remove("active");
+  });
+
+  const home = document.getElementById("home");
+  home.style.display = "flex";
+  applyHomeReveal(0);
+  loadMyChosenCity();
+  loadPartnerWeather();
+  closeMenu();
+};
+
+window.requestGodUnlocked = false;
+
+window.showPage = function(pageId) {
+
+  hideTalkInbox();
+
+  const requestGodAccess = document.getElementById("requestGodAccess");
+  if (requestGodAccess) {
+    requestGodAccess.style.display = pageId === "talk" ? "block" : "none";
+  }
+  if (pageId !== "talk") {
+    window.requestGodUnlocked = false;
+  }
+
+  document
+    .querySelectorAll(".page")
+    .forEach(function(page) {
+
+      page.classList.remove("active");
+
+    });
+
+  document
+    .getElementById("home")
+    .style.display = "none";
+
+  document
+    .getElementById(pageId)
+    .classList.add("active");
+
+  if (pageId === "book") {
+  loadBook();
+}
+  if (pageId === "love") {
+  loadInbox();
+}
+  if (pageId === "trash") {
+  loadTrash();
+}
+  if (pageId === "archive") {
+  loadArchiveAlbums();
+}
+
+  closeMenu();
+
+};
+
+function randomFutureTime() {
+  const oneDay = 24 * 60 * 60 * 1000;
+  const threeMonths = 90 * 24 * 60 * 60 * 1000;
+  return Date.now() + Math.floor(oneDay + Math.random() * (threeMonths - oneDay));
+}
+
+/* =========================
+   Send Love (Future Delivery)
+========================= */
+
+window.openLoveSend = async function() {
+
+  const from = document.body.dataset.person;
+
+  if (from !== "Shiori" && from !== "Kai") {
+    alert("Please choose your name first ♡");
+    return;
+  }
+
+  const to = from === "Kai" ? "Shiori" : "Kai";
+  const message = prompt(
+    from === "Shiori"
+      ? "Write a little love for him ♡"
+      : "Write a little love for her ♡"
+  );
+
+  if (!message || message.trim() === "") {
+    return;
+  }
+
+  try {
+    const deliverAt = randomFutureTime();
+
+    await addDoc(collection(db, "futureLove"), {
+      from: from,
+      to: to,
+      text: message.trim(),
+      createdAt: Date.now(),
+      deliverAt: deliverAt,
+      delivered: false,
+      cancelled: false,
+      savedToDiary: false,
+      trashed: false,
+      kind: "love"
+    });
+
+    alert("Your love has been sent ♡\nIt will arrive sometime in the future.");
+
+  } catch (error) {
+    console.error("Send Love error:", error);
+    alert(
+      "Your love could not be sent ♡\n\n" +
+      (error && error.code ? error.code : "Please check your Firebase connection.")
+    );
+  }
+
+};
+
+/* =========================
+   Send Music Only (Spotify)
+========================= */
+
+function getSpotifyEmbedUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    if (url.hostname !== "open.spotify.com" && url.hostname !== "www.open.spotify.com") return null;
+
+    const parts = url.pathname.split("/").filter(Boolean);
+    const types = new Set(["track", "album", "playlist", "episode", "show"]);
+    const typeIndex = parts.findIndex(function(part) { return types.has(part); });
+    if (typeIndex === -1 || !parts[typeIndex + 1]) return null;
+
+    const type = parts[typeIndex];
+    const id = parts[typeIndex + 1];
+    return `https://open.spotify.com/embed/${type}/${id}?utm_source=generator`;
+  } catch (error) {
+    return null;
+  }
+}
+
+window.openLoveMusicSend = async function() {
+  const from = document.body.dataset.person;
+
+  if (from !== "Shiori" && from !== "Kai") {
+    alert("Please choose your name first ♡");
+    return;
+  }
+
+  const to = from === "Kai" ? "Shiori" : "Kai";
+  const spotifyUrl = prompt("Paste a Spotify song link ♫");
+  if (spotifyUrl === null || spotifyUrl.trim() === "") return;
+
+  const cleanUrl = spotifyUrl.trim();
+  const embedUrl = getSpotifyEmbedUrl(cleanUrl);
+
+  if (!embedUrl) {
+    alert("Please paste a Spotify link from open.spotify.com ♡");
+    return;
+  }
+
+  try {
+    const sentAt = Date.now();
+
+    await addDoc(collection(db, "futureLove"), {
+      from: from,
+      to: to,
+      text: "",
+      spotifyUrl: cleanUrl,
+      spotifyEmbedUrl: embedUrl,
+      createdAt: sentAt,
+      deliverAt: sentAt,
+      delivered: false,
+      cancelled: false,
+      savedToDiary: false,
+      trashed: false,
+      kind: "music"
+    });
+
+    alert("Your song has been sent ♡\nIt will arrive right away.");
+    // Check immediately too, so a test send is picked up without waiting for the interval.
+    await checkFutureLove();
+  } catch (error) {
+    console.error("Send Music error:", error);
+    alert("Your song could not be sent ♡\n\n" + (error?.code || "Please check your Firebase connection."));
+  }
+};
+
+// Send button: register the click directly so it always calls the function.
+const futureLoveButton = document.getElementById("futureLoveButton");
+if (futureLoveButton) {
+  futureLoveButton.addEventListener("click", function() {
+    window.openFutureLove();
+  });
+}
+
+const sendLoveButton = document.getElementById("sendLoveButton");
+const loveSendChoice = document.getElementById("loveSendChoice");
+const loveMessageChoiceButton = document.getElementById("loveMessageChoiceButton");
+const loveMusicChoiceButton = document.getElementById("loveMusicChoiceButton");
+const closeLoveSendChoice = document.getElementById("closeLoveSendChoice");
+
+if (sendLoveButton && loveSendChoice) {
+  sendLoveButton.addEventListener("click", function() {
+    loveSendChoice.style.display = "flex";
+  });
+}
+
+if (loveMessageChoiceButton) {
+  loveMessageChoiceButton.addEventListener("click", function() {
+    if (loveSendChoice) loveSendChoice.style.display = "none";
+    window.openLoveSend();
+  });
+}
+
+if (loveMusicChoiceButton) {
+  loveMusicChoiceButton.addEventListener("click", function() {
+    if (loveSendChoice) loveSendChoice.style.display = "none";
+    window.openLoveMusicSend();
+  });
+}
+
+if (closeLoveSendChoice) {
+  closeLoveSendChoice.addEventListener("click", function() {
+    if (loveSendChoice) loveSendChoice.style.display = "none";
+  });
+}
+
+const closeFutureLoveButton = document.getElementById("closeFutureLoveButton");
+if (closeFutureLoveButton) {
+  closeFutureLoveButton.addEventListener("click", function() {
+    const panel = document.getElementById("futureLovePanel");
+    if (panel) panel.style.display = "none";
+  });
+}
+/* =========================
+   Future Love private view
+========================= */
+
+window.openFutureLove = async function() {
+  const answer = prompt("Are you God?");
+  if (answer === null) return;
+
+  if (answer.trim().toLowerCase() !== "yes") {
+    alert("Access denied ♡");
+    return;
+  }
+
+  const panel = document.getElementById("futureLovePanel");
+  panel.style.display = "block";
+  await loadFutureLove();
+};
+
+window.loadFutureLove = async function() {
+  const box = document.getElementById("futureLoveList");
+  const person = document.body.dataset.person;
+  box.innerHTML = "Checking your future loves... ♡";
+
+  try {
+    const snapshot = await getDocs(collection(db, "futureLove"));
+    const items = [];
+
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      const kind = m.kind || "love";
+      if ((kind === "love" || kind === "music") && m.from === person && !m.cancelled && !m.delivered && m.deliverAt > Date.now()) {
+        items.push({ id: snap.id, ...m });
+      }
+    });
+
+    items.sort((a,b) => a.deliverAt - b.deliverAt);
+
+    if (!items.length) {
+      box.innerHTML = '<div class="coming-soon">No scheduled love right now ♡</div>';
+      return;
+    }
+
+    box.innerHTML = items.map(function(m) {
+      if (m.kind === "music") {
+        return `
+          <article class="future-love-card">
+            <div class="love-text">🎵 A song for you</div>
+            <div class="future-love-time">Arrives: ${new Date(m.deliverAt).toLocaleString("en-GB", {dateStyle:"medium", timeStyle:"short"})}</div>
+            <button type="button" class="future-love-cancel" onclick="cancelFutureLove('${m.id}')">↩ Cancel Send</button>
+          </article>`;
+      }
+
+      return `
+        <article class="future-love-card">
+          <div class="love-text">${escapeHtml(m.text || m.message || "")}</div>
+          <div class="future-love-time">Arrives: ${new Date(m.deliverAt).toLocaleString("en-GB", {dateStyle:"medium", timeStyle:"short"})}</div>
+          <button type="button" class="future-love-cancel" onclick="cancelFutureLove('${m.id}')">↩ Cancel Send</button>
+        </article>`;
+    }).join("");
+  } catch (error) {
+    console.error(error);
+    box.innerHTML = '<div class="coming-soon">Could not open Future Love ♡</div>';
+  }
+};
+
+window.cancelFutureLove = async function(messageId) {
+  if (!confirm("Cancel this love before it arrives? ♡")) return;
+
+  const person = document.body.dataset.person;
+  try {
+    const ref = doc(db, "futureLove", messageId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      alert("This love could not be found ♡");
+      return;
+    }
+
+    const data = snap.data();
+    if (data.from !== person || data.cancelled || data.delivered || data.deliverAt <= Date.now()) {
+      alert("This love can no longer be cancelled ♡");
+      await loadFutureLove();
+      return;
+    }
+
+    // Keep the document and mark it cancelled instead of deleting it.
+    // This avoids permission errors caused by Firestore delete rules.
+    await updateDoc(ref, {
+      cancelled: true,
+      cancelledAt: Date.now()
+    });
+
+    await loadFutureLove();
+    alert("Send cancelled ♡");
+  } catch (error) {
+    console.error("Cancel Future Love error:", error);
+    alert("Send cancellation failed ♡\n\n" + (error?.code || "unknown-error") + "\n" + (error?.message || ""));
+  }
+};
+
+/* =========================
+   Check Future Love (Notification)
+========================= */
+
+async function checkFutureLove() {
+  const now = Date.now();
+  const snapshot = await getDocs(collection(db, "futureLove"));
+
+  for (const docSnap of snapshot.docs) {
+    const data = docSnap.data();
+    const kind = data.kind || "love";
+
+    if (
+      !data.cancelled &&
+      !data.delivered &&
+      (kind === "love" || kind === "talk" || kind === "music") &&
+      data.deliverAt <= now &&
+      data.to === document.body.dataset.person
+    ) {
+      // 先に delivered を true にする
+      await updateDoc(docSnap.ref, {
+        delivered: true
+      });
+
+      // Love Mail と Requests で通知を分ける
+      showLoveNotification(kind);
+    }
+  }
+}
+
+/* =========================
+   Love Notification
+========================= */
+
+function showLoveNotification(kind = "love") {
+const box = document.createElement("div");
+box.className = "love-notification";
+
+const notificationText = kind === "talk"
+  ? "🌱 You received a new request ♡"
+  : kind === "music"
+    ? "🎵 You received a song ♡"
+    : "💌 You received a little love message ♡";
+
+box.innerHTML = `     <div class="love-notification-inner">
+      ${notificationText}     </div>
+  `;
+
+document.body.appendChild(box);
+
+// スマホではバイブレーション
+// 対応しているブラウザだけ実行する
+if (typeof navigator.vibrate === "function") {
+  try {
+    navigator.vibrate([180, 80, 180, 80, 320]);
+  } catch (error) {
+    console.log("Vibration is not available on this device.");
+  }
+}
+
+// 8秒後に確実に削除
+setTimeout(() => {
+if (box && box.parentNode) {
+box.parentNode.removeChild(box);
+}
+}, 8000);
+}
+
+/* =========================
+   Load Inbox (Delivered Love)
+========================= */
+
+/* =========================
+   Show Love
+========================= */
+
+window.showLoveMessage = async function() {
+
+  const messageBox =
+    document.getElementById("loveMessage");
+
+  messageBox.innerHTML =
+    "Loading your little love... ♡";
+
+  const currentPerson =
+    document.body.dataset.person;
+
+  try {
+
+    // Love messages
+    const loveQuery =
+      query(
+        collection(db, "loveMessages"),
+        orderBy("date", "asc")
+      );
+
+    const snapshot =
+      await getDocs(loveQuery);
+
+    const receivedMessages = [];
+
+    snapshot.forEach(function(doc) {
+
+      const item = doc.data();
+
+      if (item.from !== currentPerson) {
+
+        receivedMessages.push({
+          id: doc.id,
+          ...item
+        });
+
+      }
+
+    });
+
+
+    // Saved Love
+    const savedSnapshot =
+      await getDocs(
+        collection(db, "savedLove")
+      );
+
+    const savedLoveIds = [];
+
+    savedSnapshot.forEach(function(doc) {
+
+      const item = doc.data();
+
+      if (item.person === currentPerson) {
+        savedLoveIds.push(item.loveId);
+      }
+
+    });
+
+
+    // 保存済みを除外
+    const unsavedMessages =
+      receivedMessages.filter(function(love) {
+
+        return !savedLoveIds.includes(love.id);
+
+      });
+
+
+    // まだ受け取っていないLoveがない場合
+    if (unsavedMessages.length === 0) {
+
+      messageBox.innerHTML =
+        "No little love yet ♡";
+
+      return;
+
+    }
+
+
+    // 順番に表示
+    let currentIndex =
+      Number(
+        localStorage.getItem(
+          "loveIndex_" + currentPerson
+        )
+      ) || 0;
+
+
+    if (
+      currentIndex >=
+      unsavedMessages.length
+    ) {
+
+      currentIndex = 0;
+
+    }
+
+
+    const love =
+      unsavedMessages[currentIndex];
+
+
+    localStorage.setItem(
+      "loveIndex_" + currentPerson,
+      currentIndex + 1
+    );
+
+
+    const date =
+      new Date(love.date)
+        .toLocaleDateString("en-GB");
+
+
+    messageBox.innerHTML = `
+      <div class="love-card">
+
+        <p>
+          ${escapeHtml(love.message)}
+        </p>
+
+        <small>
+          — ${escapeHtml(love.from)}
+          · ${date}
+        </small>
+
+        <br><br>
+
+        <button
+          onclick="saveLoveToBook('${love.id}')"
+          class="book-save-button"
+        >
+          📕 Keep this in my Diary
+        </button>
+
+      </div>
+    `;
+
+  } catch (error) {
+
+    console.error(error);
+
+    messageBox.innerHTML =
+      "Something went wrong ♡";
+
+  }
+
+};
+/* =========================
+   Safe text
+========================= */
+
+function escapeHtml(text) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent = text;
+
+  return div.innerHTML;
+
+}
+ /* =========================
+   Save Love to My Love Diary
+========================= */
+
+window.saveLoveToBook = async function(loveId) {
+
+  const currentPerson =
+    document.body.dataset.person;
+
+  try {
+
+    const snapshot =
+      await getDocs(collection(db, "loveMessages"));
+
+    let love = null;
+
+    snapshot.forEach(function(doc) {
+
+      if (doc.id === loveId) {
+        love = {
+          id: doc.id,
+          ...doc.data()
+        };
+      }
+
+    });
+
+    if (!love) {
+      alert("This little love could not be found ♡");
+      return;
+    }
+
+    // My Love Diaryに保存
+    await addDoc(
+      collection(db, "savedLove"),
+      {
+        person: currentPerson,
+        loveId: love.id,
+        from: love.from,
+        message: love.message,
+        date: love.date,
+        savedAt: new Date().toISOString()
+      }
+    );
+
+    // Love画面から消す
+    const messageBox =
+      document.getElementById("loveMessage");
+
+    messageBox.innerHTML =
+      "Saved to My Love Diary 📕♡";
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Something went wrong while saving your love."
+    );
+
+  }
+
+};
+  /* =========================
+   My Love Diary
+========================= */
+
+window.loadBook = async function() {
+
+  const bookMessages =
+    document.getElementById("bookMessages");
+
+  bookMessages.innerHTML =
+    "Opening your little diary... ♡";
+
+  const currentPerson =
+    document.body.dataset.person;
+
+  try {
+
+    const snapshot =
+      await getDocs(
+        collection(db, "savedLove")
+      );
+
+    const savedMessages = [];
+
+    snapshot.forEach(function(doc) {
+
+      const item = doc.data();
+
+      if (item.person === currentPerson) {
+
+        savedMessages.push({
+          id: doc.id,
+          ...item
+        });
+
+      }
+
+    });
+
+    if (savedMessages.length === 0) {
+
+      bookMessages.innerHTML =
+        "Your little loves will live here ♡";
+
+      return;
+
+    }
+
+    savedMessages.sort(function(a, b) {
+
+      return new Date(a.savedAt) -
+             new Date(b.savedAt);
+
+    });
+
+    /* 3つずつページに分ける */
+
+    const pages = [];
+
+    for (
+      let i = 0;
+      i < savedMessages.length;
+      i += 3
+    ) {
+
+      pages.push(
+        savedMessages.slice(i, i + 3)
+      );
+
+    }
+
+    let currentPage = 0;
+
+
+    /* ページを表示する */
+
+    function renderPage() {
+
+      const page =
+        pages[currentPage];
+
+      bookMessages.innerHTML = `
+
+        <div class="diary-page">
+
+          <div class="diary-messages">
+
+            ${page.map(function(love) {
+
+              const date =
+                new Date(love.date)
+                  .toLocaleDateString("en-GB");
+
+              return `
+
+                <div class="diary-message">
+
+                  <p>
+                    ${escapeHtml(love.message)}
+                  </p>
+
+                  <small>
+                    — ${escapeHtml(love.from)}
+                    · ${date}
+                  </small>
+
+                  <br><br>
+
+                  <button
+                    onclick="deleteLoveFromBook('${love.id}')"
+                    class="book-delete-button"
+                  >
+                    🗑️ Remove
+                  </button>
+
+                </div>
+
+              `;
+
+            }).join("")}
+
+          </div>
+
+
+          <!-- ページ右下の折り目 -->
+
+          <div class="page-corner"></div>
+
+
+          ${
+            currentPage < pages.length - 1
+              ? `<div class="page-hint">Swipe ←</div>`
+              : ""
+          }
+
+        </div>
+
+      `;
+
+    }
+
+
+    renderPage();
+
+
+    /* スワイプ */
+
+    let startX = 0;
+
+    bookMessages.ontouchstart =
+      function(e) {
+
+        startX =
+          e.touches[0].clientX;
+
+      };
+
+
+    bookMessages.ontouchend =
+      function(e) {
+
+        const endX =
+          e.changedTouches[0].clientX;
+
+        const distance =
+          startX - endX;
+
+
+        /* 左スワイプ → 次のページ */
+
+        if (
+          distance > 50 &&
+          currentPage < pages.length - 1
+        ) {
+
+          currentPage++;
+
+          renderPage();
+
+        }
+
+
+        /* 右スワイプ → 前のページ */
+
+        if (
+          distance < -50 &&
+          currentPage > 0
+        ) {
+
+          currentPage--;
+
+          renderPage();
+
+        }
+
+      };
+    /* PC用スワイプ（マウス） */
+let mouseStartX = 0;
+
+bookMessages.onmousedown = function(e) {
+  mouseStartX = e.clientX;
+};
+
+bookMessages.onmouseup = function(e) {
+  const mouseEndX = e.clientX;
+  const distance = mouseStartX - mouseEndX;
+
+  if (distance > 50 && currentPage < pages.length - 1) {
+    currentPage++;
+    renderPage();
+  }
+
+  if (distance < -50 && currentPage > 0) {
+    currentPage--;
+    renderPage();
+  }
+};
+
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    bookMessages.innerHTML =
+      "Something went wrong while opening your diary ♡";
+
+  }
+
+};
+/* =========================
+   Talk
+========================= */
+
+window.openTalkSend = async function() {
+  const from = document.body.dataset.person;
+
+  if (from !== "Shiori" && from !== "Kai") {
+    alert("Please choose your name first ♡");
+    return;
+  }
+
+  const to = from === "Kai" ? "Shiori" : "Kai";
+  const message = prompt("Write something you want to talk about ♡");
+
+  if (!message || message.trim() === "") return;
+
+  try {
+    // Requests arrive immediately — they are not scheduled like Love Mail.
+    const sentAt = Date.now();
+    await addDoc(collection(db, "futureLove"), {
+      from: from,
+      to: to,
+      text: message.trim(),
+      createdAt: sentAt,
+      deliverAt: sentAt,
+      delivered: true,
+      cancelled: false,
+      savedToDiary: false,
+      trashed: false,
+      kind: "talk"
+    });
+
+    alert("Your request has been sent ♡");
+  } catch (error) {
+    console.error("Send Talk error:", error);
+    alert("Your message could not be sent ♡\n\n" + (error?.code || "Please check your Firebase connection."));
+  }
+};
+
+window.talkInboxMessages = [];
+window.talkInboxPage = 1;
+
+window.renderTalkInboxPage = function() {
+  const inbox = document.getElementById("talkInbox");
+  const pagination = document.getElementById("talkPagination");
+  const prevButton = document.getElementById("talkPrevButton");
+  const nextButton = document.getElementById("talkNextButton");
+  const pageNumber = document.getElementById("talkPageNumber");
+  if (!inbox || !pagination || !prevButton || !nextButton || !pageNumber) return;
+
+  const pageSize = 5;
+  const messages = window.talkInboxMessages || [];
+  const totalPages = Math.max(1, Math.ceil(messages.length / pageSize));
+
+  if (window.talkInboxPage > totalPages) window.talkInboxPage = totalPages;
+  if (window.talkInboxPage < 1) window.talkInboxPage = 1;
+
+  const start = (window.talkInboxPage - 1) * pageSize;
+  const pageMessages = messages.slice(start, start + pageSize);
+
+  if (!messages.length) {
+    inbox.innerHTML = '<div class="coming-soon">No new messages yet ♡</div>';
+  } else {
+    inbox.innerHTML = '<div class="inbox-list">' + pageMessages.map(function(m) {
+      const deleteButton = window.requestGodUnlocked
+        ? `<div class="message-actions"><button type="button" class="future-love-cancel" onclick="deleteRequest('${m.id}')">🗑️ Delete Request</button></div>`
+        : '';
+      return `
+        <article class="love-item">
+          <div class="love-text">${escapeHtml(m.text || "")}</div>
+          <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
+          ${deleteButton}
+        </article>`;
+    }).join('') + '</div>';
+  }
+
+  pagination.style.display = totalPages > 1 ? "flex" : "none";
+  pageNumber.textContent = `${window.talkInboxPage} / ${totalPages}`;
+  prevButton.style.display = window.talkInboxPage > 1 ? "inline-block" : "none";
+  nextButton.style.display = window.talkInboxPage < totalPages ? "inline-block" : "none";
+};
+
+window.loadTalkInbox = async function() {
+  const inbox = document.getElementById("talkInbox");
+  if (!inbox) return;
+  inbox.innerHTML = "Loading your messages... ♡";
+  const person = document.body.dataset.person;
+
+  try {
+    const snapshot = await getDocs(collection(db, "futureLove"));
+    const messages = [];
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      if (m.kind === "talk" && m.to === person && !m.cancelled && !m.trashed) {
+        messages.push({ id: snap.id, ...m });
+      }
+    });
+    messages.sort((a,b) => (a.deliverAt || a.createdAt || 0) - (b.deliverAt || b.createdAt || 0));
+
+    window.talkInboxMessages = messages;
+    window.renderTalkInboxPage();
+  } catch (error) {
+    console.error(error);
+    inbox.innerHTML = '<div class="coming-soon">Could not open your messages ♡</div>';
+    const pagination = document.getElementById("talkPagination");
+    if (pagination) pagination.style.display = "none";
+  }
+};
+
+function hideTalkInbox() {
+  const wrap = document.getElementById("talkInboxWrap");
+  if (wrap) wrap.style.display = "none";
+}
+
+const sendTalkButton = document.getElementById("sendTalkButton");
+if (sendTalkButton) {
+  sendTalkButton.addEventListener("click", function() {
+    window.openTalkSend();
+  });
+}
+
+const talkReadyButton = document.getElementById("talkReadyButton");
+if (talkReadyButton) {
+  talkReadyButton.addEventListener("click", async function() {
+    const wrap = document.getElementById("talkInboxWrap");
+    if (!wrap) return;
+    wrap.style.display = "block";
+    window.talkInboxPage = 1;
+    await checkFutureLove();
+    await window.loadTalkInbox();
+  });
+}
+
+window.deleteRequest = async function(messageId) {
+  if (!window.requestGodUnlocked) {
+    alert("Please unlock this with Are you God? ♡");
+    return;
+  }
+
+  if (!confirm("Delete this request? ♡")) return;
+
+  const person = document.body.dataset.person;
+  try {
+    const ref = doc(db, "futureLove", messageId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      alert("This request could not be found ♡");
+      await window.loadTalkInbox();
+      return;
+    }
+
+    const data = snap.data();
+    if (data.kind !== "talk" || data.to !== person || data.cancelled || data.trashed) {
+      alert("This request cannot be deleted ♡");
+      await window.loadTalkInbox();
+      return;
+    }
+
+    // Hide it instead of deleting the document, so Firestore delete rules do not block it.
+    await updateDoc(ref, {
+      trashed: true,
+      deletedAt: Date.now()
+    });
+
+    await window.loadTalkInbox();
+    alert("Request deleted ♡");
+  } catch (error) {
+    console.error("Delete Request error:", error);
+    alert("Request deletion failed ♡\n\n" + (error?.code || "unknown-error") + "\n" + (error?.message || ""));
+  }
+};
+
+const requestGodButton = document.getElementById("requestGodButton");
+if (requestGodButton) {
+  requestGodButton.addEventListener("click", async function() {
+    const answer = prompt("Are you God?");
+    if (answer === null) return;
+
+    if (answer.trim().toLowerCase() !== "yes") {
+      alert("Access denied ♡");
+      return;
+    }
+
+    window.requestGodUnlocked = true;
+    const wrap = document.getElementById("talkInboxWrap");
+    if (wrap && wrap.style.display !== "none") {
+      await window.loadTalkInbox();
+    } else {
+      alert("God mode unlocked ♡ You can now delete requests from the Inbox.");
+    }
+  });
+}
+
+const talkPrevButton = document.getElementById("talkPrevButton");
+if (talkPrevButton) {
+  talkPrevButton.addEventListener("click", function() {
+    window.talkInboxPage = Math.max(1, (window.talkInboxPage || 1) - 1);
+    window.renderTalkInboxPage();
+  });
+}
+
+const talkNextButton = document.getElementById("talkNextButton");
+if (talkNextButton) {
+  talkNextButton.addEventListener("click", function() {
+    const totalPages = Math.max(1, Math.ceil((window.talkInboxMessages || []).length / 5));
+    window.talkInboxPage = Math.min(totalPages, (window.talkInboxPage || 1) + 1);
+    window.renderTalkInboxPage();
+  });
+}
+
+/* =========================
+   New Inbox → Diary → Trash system
+========================= */
+
+window.loadInbox = async function() {
+  const inbox = document.getElementById("loveInbox");
+  inbox.innerHTML = "Loading your inbox... ♡";
+  const person = document.body.dataset.person;
+
+  try {
+    const snapshot = await getDocs(collection(db, "futureLove"));
+    const messages = [];
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      const kind = m.kind || "love";
+      if ((kind === "love" || kind === "music") && m.to === person && !m.cancelled && m.delivered && !m.savedToDiary && !m.trashed) {
+        messages.push({ id: snap.id, ...m });
+      }
+    });
+    messages.sort((a,b) => (a.deliverAt || 0) - (b.deliverAt || 0));
+
+    if (!messages.length) {
+      inbox.innerHTML = '<div class="coming-soon">No new little love yet ♡</div>';
+      return;
+    }
+
+    inbox.innerHTML = '<div class="inbox-list">' + messages.map(function(m) {
+      if (m.kind === "music") {
+        const embedUrl = m.spotifyEmbedUrl || getSpotifyEmbedUrl(m.spotifyUrl || "");
+        const safeSpotifyUrl = escapeHtml(m.spotifyUrl || "");
+        return `
+          <article class="love-item">
+            <div class="love-text">🎵 A song for you</div>
+            <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
+            ${embedUrl ? `<div class="spotify-card"><iframe src="${embedUrl}" title="Spotify player" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe><a class="book-save-button spotify-fallback" href="${safeSpotifyUrl}" target="_blank" rel="noopener">🎵 Open in Spotify</a></div>` : `<a class="book-save-button spotify-fallback" href="${safeSpotifyUrl}" target="_blank" rel="noopener">🎵 Open in Spotify</a>`}
+          </article>`;
+      }
+
+      return `
+        <article class="love-item">
+          <div class="love-text">${escapeHtml(m.text || "")}</div>
+          <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
+          <div class="message-actions">
+            <button class="book-save-button" onclick="saveFutureLoveToDiary('${m.id}')">📕 Add to Diary</button>
+          </div>
+        </article>`;
+    }).join('') + '</div>';
+  } catch (error) {
+    console.error(error);
+    inbox.innerHTML = '<div class="coming-soon">Could not open your inbox ♡</div>';
+  }
+};
+
+window.saveFutureLoveToDiary = async function(messageId) {
+  const person = document.body.dataset.person;
+  try {
+    const messageRef = doc(db, "futureLove", messageId);
+    const snapshot = await getDocs(collection(db, "futureLove"));
+    let message = null;
+    snapshot.forEach(function(snap) {
+      if (snap.id === messageId) message = { id: snap.id, ...snap.data() };
+    });
+    if (!message) return;
+
+    await addDoc(collection(db, "savedLove"), {
+      person: person,
+      loveId: message.id,
+      from: message.from,
+      message: message.kind === "music" ? "🎵 Spotify song" : (message.text || ""),
+      spotifyUrl: message.spotifyUrl || "",
+      date: new Date(message.createdAt || Date.now()).toISOString(),
+      savedAt: new Date().toISOString(),
+      source: "futureLove"
+    });
+
+    await updateDoc(messageRef, { savedToDiary: true });
+    await loadInbox();
+    alert("Added to My Love Diary 📕♡");
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong while adding this love.");
+  }
+};
+
+window.loadTrash = async function() {
+  const box = document.getElementById("trashMessages");
+  box.innerHTML = "Opening your trash... ♡";
+  const person = document.body.dataset.person;
+  try {
+    const snapshot = await getDocs(collection(db, "trashLove"));
+    const items = [];
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      if (m.person === person) items.push({ id: snap.id, ...m });
+    });
+    items.sort((a,b) => new Date(b.deletedAt || 0) - new Date(a.deletedAt || 0));
+    if (!items.length) {
+      box.innerHTML = '<div class="coming-soon">Trash is empty ♡</div>';
+      return;
+    }
+    box.innerHTML = '<div class="trash-list">' + items.map(function(m) {
+      return `
+        <article class="trash-item">
+          <div class="trash-text">${escapeHtml(m.message || "")}</div>
+          <div class="trash-meta">from ${escapeHtml(m.from || "")} · deleted ${new Date(m.deletedAt || Date.now()).toLocaleDateString("en-GB")}</div>
+          <div class="message-actions">
+            <button class="restore-button" onclick="restoreLoveFromTrash('${m.id}')">↩ Restore</button>
+            <button class="empty-trash-button" onclick="permanentlyDeleteTrash('${m.id}')">Delete forever</button>
+          </div>
+        </article>`;
+    }).join('') + '</div>';
+  } catch (error) {
+    console.error(error);
+    box.innerHTML = '<div class="coming-soon">Could not open trash ♡</div>';
+  }
+};
+
+window.deleteLoveFromBook = async function(savedDocId) {
+  const person = document.body.dataset.person;
+
+  try {
+    if (!savedDocId) {
+      alert("This little love could not be found ♡");
+      return;
+    }
+
+    const savedRef = doc(db, "savedLove", savedDocId);
+    const savedSnap = await getDoc(savedRef);
+
+    if (!savedSnap.exists()) {
+      alert("This little love could not be found ♡");
+      await loadBook();
+      return;
+    }
+
+    const found = { id: savedSnap.id, ...savedSnap.data() };
+
+    if (found.person !== person) {
+      alert("This little love does not belong to this diary ♡");
+      return;
+    }
+
+    const trashData = {
+      person: found.person,
+      loveId: found.loveId || "",
+      from: found.from || "",
+      message: found.message || "",
+      date: found.date || new Date().toISOString(),
+      savedAt: found.savedAt || new Date().toISOString(),
+      source: found.source || "savedLove",
+      originalSavedLoveId: found.id,
+      deletedAt: new Date().toISOString()
+    };
+
+    // First copy it to Trash. Only delete the Diary copy after the Trash copy succeeds.
+    await addDoc(collection(db, "trashLove"), trashData);
+    await deleteDoc(savedRef);
+    await loadBook();
+  } catch (error) {
+    console.error("Diary Remove error:", error);
+    alert(
+      "Remove failed ♡\n\n" +
+      (error && error.code ? error.code : "unknown-error") +
+      "\n\n" +
+      (error && error.message ? error.message : "Please try again.")
+    );
+  }
+};
+
+window.restoreLoveFromTrash = async function(trashId) {
+  try {
+    const snapshot = await getDocs(collection(db, "trashLove"));
+    let found = null;
+    snapshot.forEach(function(snap) { if (snap.id === trashId) found = { id: snap.id, ...snap.data() }; });
+    if (!found) return;
+    const { id, originalSavedLoveId, deletedAt, ...data } = found;
+    await addDoc(collection(db, "savedLove"), data);
+    await deleteDoc(doc(db, "trashLove", trashId));
+    loadTrash();
+  } catch (error) {
+    console.error(error);
+    alert("Could not restore this love.");
+  }
+};
+
+window.permanentlyDeleteTrash = async function(trashId) {
+  if (!confirm("Delete this little love forever?")) return;
+  try {
+    await deleteDoc(doc(db, "trashLove", trashId));
+    loadTrash();
+  } catch (error) {
+    console.error(error);
+    alert("Could not delete this love.");
+  }
+};
+
+window.onload = function() {
+  checkFutureLove();
+
+  setInterval(() => {
+    checkFutureLove();
+  }, 10000);
+};
+
+</script>
+</body>
+</html>
