@@ -2738,7 +2738,11 @@ function initHomeRevealSlider() {
     if (!dragging || !isMobile()) return;
     const distance = event.clientX - startX;
     const direction = distance >= 0 ? "right" : "left";
-    const nextProgress = startProgress + distance / Math.max(180, copy.getBoundingClientRect().width);
+
+    // Mobile is intentionally more sensitive: a short swipe can reveal the
+    // whole partner panel. About 120px of movement represents the full travel.
+    const travel = 120;
+    const nextProgress = startProgress + distance / travel;
     setProgress(nextProgress, direction);
   });
 
@@ -2747,6 +2751,18 @@ function initHomeRevealSlider() {
     dragging = false;
     if (event && copy.hasPointerCapture?.(event.pointerId)) {
       try { copy.releasePointerCapture(event.pointerId); } catch (_) {}
+    }
+
+    const distance = event ? (event.clientX - startX) : 0;
+    const threshold = 24;
+
+    // A small but intentional swipe snaps smoothly to the nearest end.
+    // This makes the mobile interaction feel much easier and more forgiving.
+    if (Math.abs(distance) >= threshold) {
+      const direction = distance >= 0 ? "right" : "left";
+      animateTo(direction === "right" ? 1 : 0, direction);
+    } else {
+      animateTo(startProgress, distance >= 0 ? "right" : "left");
     }
   };
 
