@@ -1416,7 +1416,7 @@ transform: translate(-50%, 0) scale(1);
           type="button"
           class="home-arrow"
           id="homeRevealPrev"
-          aria-label="Reveal from the right"
+          aria-label="Reveal your love's world"
         >
           ‹
         </button>
@@ -1444,7 +1444,7 @@ transform: translate(-50%, 0) scale(1);
 
           <div id="homeWeatherInfo" class="home-weather-info" aria-live="polite">
             <div id="homeWeatherMain" class="home-weather-main">Their world is waiting ♡</div>
-            <div id="homeWeatherSub" class="home-weather-sub">Swipe to reveal their time and weather.</div>
+            <div id="homeWeatherSub" class="home-weather-sub">Swipe left to reveal · swipe right to hide.</div>
             <div id="homeWeatherNote" class="home-weather-note"></div>
           </div>
 
@@ -1454,7 +1454,7 @@ transform: translate(-50%, 0) scale(1);
           type="button"
           class="home-arrow"
           id="homeRevealNext"
-          aria-label="Reveal from the left"
+          aria-label="Hide your love's world"
         >
           ›
         </button>
@@ -2504,21 +2504,12 @@ function applyHomeReveal(progress, direction) {
   copy.setAttribute("aria-valuenow", String(Math.round(p * 100)));
 
   const state = window.partnerWeatherState;
-  // PC arrows use one consistent motion: reveal from the left, return to the left.
-  // Mobile swipes keep their original direction metadata for accessibility/state.
-  // The travel direction controls which side the partner information enters/exits.
-  // Mobile: left swipe reveals from the right; right swipe hides to the right.
-  // Desktop keeps the original left-entry reveal behavior for the PC arrows/click.
-  let x = -42 * (1 - p);
-  if (window.matchMedia && window.matchMedia("(max-width: 600px)").matches) {
-    if (dir === "left") {
-      // Reveal while swiping left: start on the right and slide inward.
-      x = 42 * (1 - p);
-    } else if (dir === "right") {
-      // Hide while swiping right: leave toward the right.
-      x = 42 * (1 - p);
-    }
-  }
+
+  // The same state can be opened/closed from either side.
+  // "left" means the content travels to/from the left.
+  // "right" means the content travels to/from the right.
+  const x = dir === "left" ? -42 * (1 - p) : 42 * (1 - p);
+
   info.style.opacity = String(Math.min(1, p * 1.18));
   info.style.transform = `translateX(${x}px) translateY(${10 - p * 10}px)`;
 
@@ -2673,7 +2664,8 @@ function initHomeRevealSlider() {
     applyHomeReveal(progress, direction);
   };
 
-  // PC: one click triggers a smooth animation all the way to the next side.
+  // One click always toggles the state. The side of the clicked button
+  // controls only the travel direction.
   const animateTo = (target, direction) => {
     if (animationFrame) cancelAnimationFrame(animationFrame);
 
@@ -2681,7 +2673,6 @@ function initHomeRevealSlider() {
     const end = Math.max(0, Math.min(1, target));
     const duration = 850;
     const startTime = performance.now();
-
     const ease = (t) => 1 - Math.pow(1 - t, 3);
 
     const step = (now) => {
@@ -2700,40 +2691,45 @@ function initHomeRevealSlider() {
     animationFrame = requestAnimationFrame(step);
   };
 
+  const toggleByDirection = (direction) => {
+    const target = progress < 0.5 ? 1 : 0;
+    animateTo(target, direction);
+  };
+
   if (prev) {
     prev.addEventListener("click", function() {
       if (isMobile()) return;
-      animateTo(0, "left");
+      toggleByDirection("left");
     });
   }
+
   if (next) {
     next.addEventListener("click", function() {
       if (isMobile()) return;
-      animateTo(1, "right");
+      toggleByDirection("right");
     });
   }
 
-  // On PC, clicking the text itself smoothly reveals from the clicked side.
+  // PC text clicks also toggle the state; the half that was clicked
+  // determines which side the information travels toward/from.
   copy.addEventListener("click", function(event) {
     if (isMobile()) return;
     const rect = copy.getBoundingClientRect();
-    const isRightSide = (event.clientX - rect.left) > (rect.width / 2);
-    animateTo(isRightSide ? 1 : 0, isRightSide ? "right" : "left");
+    const clickedRightHalf = (event.clientX - rect.left) > (rect.width / 2);
+    toggleByDirection(clickedRightHalf ? "right" : "left");
   });
 
-  // Keyboard support on the text itself.
   copy.addEventListener("keydown", function(event) {
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      setProgress(progress + 0.2, "right");
+      toggleByDirection("right");
     }
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      setProgress(progress - 0.2, "left");
+      toggleByDirection("left");
     }
   });
 
-  // Mobile: the actual text block becomes the swipe area.
   const mobileQuery = window.matchMedia("(max-width: 600px)");
   const isMobile = () => mobileQuery.matches;
 
@@ -2750,10 +2746,6 @@ function initHomeRevealSlider() {
     if (!dragging || !isMobile()) return;
     const distance = event.clientX - startX;
     const direction = distance >= 0 ? "right" : "left";
-
-    // Mobile direction is intentionally intuitive for the reveal gesture:
-    // swipe left -> reveal the partner information from the right;
-    // swipe right -> hide it toward the right.
     const travel = 120;
     const nextProgress = startProgress - distance / travel;
     setProgress(nextProgress, direction);
@@ -2769,12 +2761,12 @@ function initHomeRevealSlider() {
     const distance = event ? (event.clientX - startX) : 0;
     const threshold = 24;
 
-    // A small but intentional swipe snaps smoothly to the nearest end.
-    // This makes the mobile interaction feel much easier and more forgiving.
     if (Math.abs(distance) >= threshold) {
       const direction = distance >= 0 ? "right" : "left";
-      // Swipe right = hide; swipe left = reveal.
-      animateTo(direction === "right" ? 0 : 1, direction);
+      // When hidden, either swipe reveals; when visible, either swipe hides.
+      // The swipe direction controls the side of the transition.
+      const target = startProgress < 0.5 ? 1 : 0;
+      animateTo(target, direction);
     } else {
       animateTo(startProgress, distance >= 0 ? "right" : "left");
     }
@@ -2797,11 +2789,6 @@ function initHomeRevealSlider() {
 
   setProgress(0, "right");
 }
-
-/* =========================
-   Menu
-
-========================= */
 
 window.openMenu = function() {
 
