@@ -676,6 +676,27 @@ transform: translate(-50%, 0) scale(1);
 .love-text, .trash-text { font-size: 17px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 .love-meta, .trash-meta { margin-top: 10px; color: #8a7258; font-size: 12px; line-height: 1.6; }
 .message-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+.talk-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0 6px;
+}
+.talk-page-button {
+  border: 1px solid rgba(120,90,70,.18);
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: rgba(255,255,255,.72);
+  color: #6f5a50;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+}
+.talk-page-button:hover { background: rgba(255,255,255,.92); }
+.talk-page-button:disabled { opacity: .4; cursor: default; }
+.talk-page-number { color: #8a7770; font-size: 12px; min-width: 44px; text-align: center; }
+
 .message-actions button, .book-delete-button, .restore-button, .empty-trash-button {
   border: 0; border-radius: 999px; padding: 10px 15px; cursor:pointer; font-family:inherit;
 }
@@ -1121,6 +1142,12 @@ transform: translate(-50%, 0) scale(1);
       </div>
 
       <div id="talkInbox" class="love-message"></div>
+
+      <div id="talkPagination" class="talk-pagination" style="display:none;">
+        <button type="button" id="talkPrevButton" class="talk-page-button">← Previous</button>
+        <span id="talkPageNumber" class="talk-page-number">1 / 1</span>
+        <button type="button" id="talkNextButton" class="talk-page-button">Next Page →</button>
+      </div>
     </div>
 
   </section>
@@ -1538,7 +1565,7 @@ window.loadFutureLove = async function() {
     box.innerHTML = items.map(function(m) {
       return `
         <article class="future-love-card">
-          <div class="love-text">${escapeHtml(m.text || "")}</div>
+          <div class="love-text">${escapeHtml(m.text || m.message || "")}</div>
           <div class="future-love-time">Arrives: ${new Date(m.deliverAt).toLocaleString("en-GB", {dateStyle:"medium", timeStyle:"short"})}</div>
           <button type="button" class="future-love-cancel" onclick="cancelFutureLove('${m.id}')">↩ Cancel Send</button>
         </article>`;
@@ -1588,42 +1615,45 @@ window.cancelFutureLove = async function(messageId) {
 ========================= */
 
 async function checkFutureLove() {
-const now = Date.now();
-const snapshot = await getDocs(collection(db, "futureLove"));
+  const now = Date.now();
+  const snapshot = await getDocs(collection(db, "futureLove"));
 
-for (const docSnap of snapshot.docs) {
-const data = docSnap.data();
+  for (const docSnap of snapshot.docs) {
+    const data = docSnap.data();
+    const kind = data.kind || "love";
 
-if (
-  !data.cancelled &&
-  !data.delivered &&
-  (data.kind || "love") === "love" &&
-  data.deliverAt <= now &&
-  data.to === document.body.dataset.person
-) {
+    if (
+      !data.cancelled &&
+      !data.delivered &&
+      (kind === "love" || kind === "talk") &&
+      data.deliverAt <= now &&
+      data.to === document.body.dataset.person
+    ) {
+      // 先に delivered を true にする
+      await updateDoc(docSnap.ref, {
+        delivered: true
+      });
 
-  // 先に delivered を true にする
-  await updateDoc(docSnap.ref, {
-    delivered: true
-  });
-
-  // そのあと通知を出す
-  showLoveNotification();
-}
-
-}
+      // Love Mail と Requests で通知を分ける
+      showLoveNotification(kind);
+    }
+  }
 }
 
 /* =========================
    Love Notification
 ========================= */
 
-function showLoveNotification() {
+function showLoveNotification(kind = "love") {
 const box = document.createElement("div");
 box.className = "love-notification";
 
+const notificationText = kind === "talk"
+  ? "🌱 You received a new request ♡"
+  : "💌 You received a little love message ♡";
+
 box.innerHTML = `     <div class="love-notification-inner">
-      💌 You received a little love message ♡     </div>
+      ${notificationText}     </div>
   `;
 
 document.body.appendChild(box);
@@ -2127,25 +2157,65 @@ window.openTalkSend = async function() {
   if (!message || message.trim() === "") return;
 
   try {
-    const deliverAt = randomFutureTime();
+    // Requests arrive immediately — they are not scheduled like Love Mail.
+    const sentAt = Date.now();
     await addDoc(collection(db, "futureLove"), {
       from: from,
       to: to,
       text: message.trim(),
-      createdAt: Date.now(),
-      deliverAt: deliverAt,
-      delivered: false,
+      createdAt: sentAt,
+      deliverAt: sentAt,
+      delivered: true,
       cancelled: false,
       savedToDiary: false,
       trashed: false,
       kind: "talk"
     });
 
-    alert("Your message has been sent ♡");
+    alert("Your request has been sent ♡");
   } catch (error) {
     console.error("Send Talk error:", error);
     alert("Your message could not be sent ♡\n\n" + (error?.code || "Please check your Firebase connection."));
   }
+};
+
+window.talkInboxMessages = [];
+window.talkInboxPage = 1;
+
+window.renderTalkInboxPage = function() {
+  const inbox = document.getElementById("talkInbox");
+  const pagination = document.getElementById("talkPagination");
+  const prevButton = document.getElementById("talkPrevButton");
+  const nextButton = document.getElementById("talkNextButton");
+  const pageNumber = document.getElementById("talkPageNumber");
+  if (!inbox || !pagination || !prevButton || !nextButton || !pageNumber) return;
+
+  const pageSize = 5;
+  const messages = window.talkInboxMessages || [];
+  const totalPages = Math.max(1, Math.ceil(messages.length / pageSize));
+
+  if (window.talkInboxPage > totalPages) window.talkInboxPage = totalPages;
+  if (window.talkInboxPage < 1) window.talkInboxPage = 1;
+
+  const start = (window.talkInboxPage - 1) * pageSize;
+  const pageMessages = messages.slice(start, start + pageSize);
+
+  if (!messages.length) {
+    inbox.innerHTML = '<div class="coming-soon">No new messages yet ♡</div>';
+  } else {
+    inbox.innerHTML = '<div class="inbox-list">' + pageMessages.map(function(m) {
+      return `
+        <article class="love-item">
+          <div class="love-text">${escapeHtml(m.text || "")}</div>
+          <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
+        </article>`;
+    }).join('') + '</div>';
+  }
+
+  pagination.style.display = totalPages > 1 ? "flex" : "none";
+  pageNumber.textContent = `${window.talkInboxPage} / ${totalPages}`;
+  prevButton.style.display = window.talkInboxPage > 1 ? "inline-block" : "none";
+  nextButton.style.display = window.talkInboxPage < totalPages ? "inline-block" : "none";
 };
 
 window.loadTalkInbox = async function() {
@@ -2159,27 +2229,19 @@ window.loadTalkInbox = async function() {
     const messages = [];
     snapshot.forEach(function(snap) {
       const m = snap.data();
-      if (m.kind === "talk" && m.to === person && !m.cancelled && m.delivered && !m.trashed) {
+      if (m.kind === "talk" && m.to === person && !m.cancelled && !m.trashed) {
         messages.push({ id: snap.id, ...m });
       }
     });
-    messages.sort((a,b) => (a.deliverAt || 0) - (b.deliverAt || 0));
+    messages.sort((a,b) => (a.deliverAt || a.createdAt || 0) - (b.deliverAt || b.createdAt || 0));
 
-    if (!messages.length) {
-      inbox.innerHTML = '<div class="coming-soon">No new messages yet ♡</div>';
-      return;
-    }
-
-    inbox.innerHTML = '<div class="inbox-list">' + messages.map(function(m) {
-      return `
-        <article class="love-item">
-          <div class="love-text">${escapeHtml(m.text || "")}</div>
-          <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
-        </article>`;
-    }).join('') + '</div>';
+    window.talkInboxMessages = messages;
+    window.renderTalkInboxPage();
   } catch (error) {
     console.error(error);
     inbox.innerHTML = '<div class="coming-soon">Could not open your messages ♡</div>';
+    const pagination = document.getElementById("talkPagination");
+    if (pagination) pagination.style.display = "none";
   }
 };
 
@@ -2201,7 +2263,26 @@ if (talkReadyButton) {
     const wrap = document.getElementById("talkInboxWrap");
     if (!wrap) return;
     wrap.style.display = "block";
+    window.talkInboxPage = 1;
+    await checkFutureLove();
     await window.loadTalkInbox();
+  });
+}
+
+const talkPrevButton = document.getElementById("talkPrevButton");
+if (talkPrevButton) {
+  talkPrevButton.addEventListener("click", function() {
+    window.talkInboxPage = Math.max(1, (window.talkInboxPage || 1) - 1);
+    window.renderTalkInboxPage();
+  });
+}
+
+const talkNextButton = document.getElementById("talkNextButton");
+if (talkNextButton) {
+  talkNextButton.addEventListener("click", function() {
+    const totalPages = Math.max(1, Math.ceil((window.talkInboxMessages || []).length / 5));
+    window.talkInboxPage = Math.min(totalPages, (window.talkInboxPage || 1) + 1);
+    window.renderTalkInboxPage();
   });
 }
 
