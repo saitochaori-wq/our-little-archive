@@ -3044,21 +3044,24 @@ transform: translate(-50%, 0) scale(1);
       </span>
 
       Trash
+<button
+  class="menu-item icon-closet-menu"
+  onclick="showPage('iconCloset')"
+>
+  <span>
+    🎀
+  </span>
 
-    </button>
+  Icon Closet
 
-    <button
-      class="menu-item"
-      onclick="showPage('iconCloset')"
-    >
-
-      <span>
-        🎀
-      </span>
-
-      Icon Closet
-
-    </button>
+</button>
+      <style>
+@media (min-width: 769px) {
+  .icon-closet-menu {
+    display: none !important;
+  }
+}
+</style>
 
   
     
