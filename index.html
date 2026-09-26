@@ -755,6 +755,25 @@ object-position: center top;
       margin-bottom: 2px;
     }
 
+    .archive-photo-title-button {
+      display: block;
+      width: 100%;
+      border: 0;
+      padding: 0;
+      margin: 0 0 2px;
+      background: transparent;
+      color: #6b5555;
+      text-align: left;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      word-break: break-word;
+    }
+
+    .archive-photo-title-button:hover {
+      text-decoration: underline;
+    }
+
     .archive-album-add-row {
       display: flex;
       flex-direction: column;
@@ -1491,6 +1510,12 @@ transform: translate(-50%, 0) scale(1);
  
 
 
+
+<div id="archivePhotoLightbox" class="archive-photo-lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Photo preview">
+  <button type="button" id="archivePhotoLightboxClose" class="archive-photo-lightbox-close" aria-label="Close">×</button>
+  <img id="archivePhotoLightboxImage" src="" alt="Memory photo preview">
+</div>
+
 <section id="trash" class="page">
 
   <h2>🗑️ Trash</h2>
@@ -1690,8 +1715,8 @@ async function loadArchiveAlbums() {
                 <button type="button" class="archive-photo-delete-button" data-photo-delete="${album.id}" data-photo-index="${photoIndex}" aria-label="Delete photo">×</button>
               </div>
               <div class="archive-photo-meta">
-                <strong>♡ Memory</strong>
-                Added by ${sanitizeArchiveText(photo.addedBy || addedBy)}
+                <button type="button" class="archive-photo-title-button" data-photo-title="${album.id}" data-photo-index="${photoIndex}" aria-label="Edit photo title">♡ ${sanitizeArchiveText(photo.title || "Memory")}</button>
+                <div>Added by ${sanitizeArchiveText(photo.addedBy || addedBy)}</div>
               </div>
             </div>
           `;
@@ -1789,6 +1814,15 @@ async function loadArchiveAlbums() {
         );
       });
     });
+
+    document.querySelectorAll('[data-photo-title]').forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        editArchivePhotoTitle(
+          event.currentTarget.dataset.photoTitle,
+          Number(event.currentTarget.dataset.photoIndex)
+        );
+      });
+    });
   } catch (error) {
     console.error("Archive album load error:", error);
     gallery.innerHTML = '<div class="archive-empty">Could not load your albums ♡</div>';
@@ -1813,6 +1847,50 @@ function openArchivePhoto(albumId, photoIndex) {
     console.error("Archive photo open error:", error);
   });
 }
+
+async function editArchivePhotoTitle(albumId, photoIndex) {
+  if (!albumId || Number.isNaN(photoIndex)) return;
+
+  try {
+    const albumRef = doc(db, "archiveAlbums", albumId);
+    const snap = await getDoc(albumRef);
+    if (!snap.exists()) {
+      alert("This album could not be found ♡");
+      return;
+    }
+
+    const album = snap.data() || {};
+    const photos = Array.isArray(album.photos) ? album.photos.slice(0, 3) : [];
+    const photo = photos[photoIndex];
+    if (!photo) {
+      alert("This photo could not be found ♡");
+      return;
+    }
+
+    const currentTitle = String(photo.title || "Memory");
+    const nextTitle = prompt("Photo title ♡", currentTitle);
+    if (nextTitle === null) return;
+
+    const cleanTitle = nextTitle.trim() || "Memory";
+    photos[photoIndex] = { ...photo, title: cleanTitle };
+
+    await updateDoc(albumRef, {
+      photos: photos,
+      updatedAt: Date.now()
+    });
+
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive photo title error:", error);
+    alert(
+      "The photo title could not be changed ♡\n\n" +
+      (error?.code || "unknown-error") + "\n" +
+      (error?.message || "")
+    );
+  }
+}
+
+window.editArchivePhotoTitle = editArchivePhotoTitle;
 
 async function deleteArchiveAlbumPhoto(albumId, photoIndex) {
   if (!albumId || Number.isNaN(photoIndex)) return;
@@ -2056,6 +2134,7 @@ async function uploadArchiveAlbumPhotos(albumId, files) {
       newPhotos.push({
         url: dataUrl,
         name: file.name,
+        title: "Memory",
         addedBy: person,
         createdAt: Date.now()
       });
