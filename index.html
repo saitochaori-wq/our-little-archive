@@ -2160,51 +2160,53 @@ transform: translate(-50%, 0) scale(1);
 
 .weather-rain{
   position:absolute;
-  inset:-15%;
+  inset:0;
   opacity:0;
-  background-image:
-    repeating-linear-gradient(
-      104deg,
-      transparent 0 17px,
-      rgba(225,242,255,.58) 18px 20px,
-      transparent 21px 43px
-    );
-  transform:rotate(2deg);
-  animation:weatherRain 1.05s linear infinite;
+  overflow:hidden;
+  pointer-events:none;
 }
 
-#home[data-weather="Rain"] .weather-rain{
-  background-image:
-    repeating-linear-gradient(
-      104deg,
-      transparent 0 13px,
-      rgba(230,244,255,.68) 14px 16px,
-      transparent 17px 31px
-    );
+.weather-drop{
+  position:absolute;
+  top:-12%;
+  width:2px;
+  height:11px;
+  border-radius:999px;
+  background:rgba(225,242,255,.62);
+  transform:rotate(10deg);
+  animation:weatherDropFall 1.15s linear infinite;
+  will-change:top,opacity;
+}
+
+#home[data-weather="Drizzle"] .weather-drop{
+  opacity:.55;
+  height:8px;
+  animation-duration:1.55s;
+}
+
+#home[data-weather="Rain"] .weather-drop{
+  opacity:.9;
+  height:12px;
+  animation-duration:1.05s;
+}
+
+#home[data-weather="Showers"] .weather-drop{
+  opacity:.78;
+  height:11px;
+  animation-duration:.92s;
+}
+
+#home[data-weather="Storm"] .weather-drop{
+  opacity:.95;
+  height:14px;
+  background:rgba(225,241,255,.72);
   animation-duration:.72s;
 }
 
-#home[data-weather="Storm"] .weather-rain{
-  background-image:
-    repeating-linear-gradient(
-      104deg,
-      transparent 0 9px,
-      rgba(225,241,255,.75) 10px 12px,
-      transparent 13px 25px
-    );
-  animation-duration:.48s;
+#home[data-daypart="night"] .weather-drop,
+#home[data-daypart="late-night"] .weather-drop{
+  background:rgba(230,240,255,.72);
 }
-
-#home[data-weather="Drizzle"] .weather-rain{
-  opacity:.65;
-  transform:rotate(1deg);
-  animation-duration:1.5s;
-}
-
-#home[data-weather="Showers"] .weather-rain{
-  opacity:.9;
-}
-
 
 /* =========================================================
    雪
@@ -3137,6 +3139,25 @@ transform: translate(-50%, 0) scale(1);
     display: none !important;
   }
 }
+/* =========================================================
+   夜のテキスト
+   ========================================================= */
+
+#home[data-daypart="night"] .home-reveal-copy h1,
+#home[data-daypart="night"] .home-reveal-copy > p,
+#home[data-daypart="night"] .home-weather-main,
+#home[data-daypart="night"] .home-weather-sub,
+#home[data-daypart="night"] .home-weather-note,
+#home[data-daypart="night"] .home-location-button,
+#home[data-daypart="late-night"] .home-reveal-copy h1,
+#home[data-daypart="late-night"] .home-reveal-copy > p,
+#home[data-daypart="late-night"] .home-weather-main,
+#home[data-daypart="late-night"] .home-weather-sub,
+#home[data-daypart="late-night"] .home-weather-note,
+#home[data-daypart="late-night"] .home-location-button {
+  color:#fff !important;
+}
+
 </style>
 
   
