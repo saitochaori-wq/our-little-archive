@@ -1388,7 +1388,7 @@ transform: translate(-50%, 0) scale(1);
 
         <img
   class="avatar"
-  src="assets/IMG_6564.png"
+  src="./IMG_6564.png"
   alt="Shiori"
   style="object-position: center 20%;"
 >
@@ -1413,7 +1413,7 @@ transform: translate(-50%, 0) scale(1);
 
         <img
           class="avatar"
-          src="assets/IMG_6560.png"
+          src="./IMG_6560.png"
           alt="Kai"
          style=" object-position: center 25%;"
         >
@@ -1984,51 +1984,6 @@ transform: translate(-50%, 0) scale(1);
   <!-- =========================
        JavaScript
   ========================== -->
-
-<!-- Login fallback: keeps the person-selection screen working even if a Firebase module
-     temporarily fails to load. The archive itself can still open, and Firebase can load
-     normally afterward. -->
-<script>
-(function () {
-  let fallbackSelectedPerson = null;
-
-  function fallbackEnterArchive(person) {
-    const login = document.getElementById("loginScreen");
-    const remember = document.getElementById("rememberBox");
-    if (login) login.style.display = "none";
-    if (remember) remember.style.display = "none";
-    document.body.dataset.person = person;
-  }
-
-  window.choosePerson = function (person) {
-    fallbackSelectedPerson = person;
-    const name = document.getElementById("rememberName");
-    const box = document.getElementById("rememberBox");
-    if (name) name.textContent = person;
-    if (box) box.style.display = "flex";
-  };
-
-  window.rememberYes = function () {
-    if (!fallbackSelectedPerson) return;
-    localStorage.setItem("archivePerson", fallbackSelectedPerson);
-    fallbackEnterArchive(fallbackSelectedPerson);
-  };
-
-  window.rememberNo = function () {
-    if (!fallbackSelectedPerson) return;
-    localStorage.removeItem("archivePerson");
-    fallbackEnterArchive(fallbackSelectedPerson);
-  };
-
-  window.addEventListener("DOMContentLoaded", function () {
-    const saved = localStorage.getItem("archivePerson");
-    if (saved === "Shiori" || saved === "Kai") {
-      fallbackEnterArchive(saved);
-    }
-  });
-})();
-</script>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
