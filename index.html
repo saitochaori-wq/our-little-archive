@@ -570,6 +570,172 @@ object-position: center top;
       margin-top: 7px;
     }
 
+    .archive-photos-section {
+      margin-top: 24px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 20px;
+      background: rgba(255,255,255,.48);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .archive-photos-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .archive-photos-header h3 {
+      margin: 0 0 4px;
+    }
+
+    .archive-upload-button,
+    .archive-create-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 9px 15px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      color: #6b4f4f;
+      border: 1px solid rgba(120,80,80,.18);
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(80,50,50,.10);
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      font-family: inherit;
+    }
+
+    .archive-upload-button:hover,
+    .archive-create-button:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 6px 16px rgba(80,50,50,.14);
+    }
+
+    .archive-photo-status {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.65);
+      font-size: 13px;
+    }
+
+    .archive-album-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .archive-album-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(120,90,70,.12);
+      box-shadow: 0 5px 16px rgba(80,50,50,.08);
+    }
+
+    .archive-album-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .archive-album-title {
+      margin: 0;
+      font-size: 18px;
+      font-family: Georgia, serif;
+      color: #5f4b47;
+      word-break: break-word;
+    }
+
+    .archive-album-count {
+      flex: 0 0 auto;
+      font-size: 11px;
+      color: #8a7770;
+      white-space: nowrap;
+    }
+
+    .archive-album-photos {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .archive-album-photos .archive-photo-card {
+      overflow: hidden;
+      border-radius: 12px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 4px 12px rgba(80,50,50,.08);
+    }
+
+    .archive-photo-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: rgba(0,0,0,.04);
+    }
+
+    .archive-photo-meta {
+      padding: 7px 8px 8px;
+      font-size: 10px;
+      line-height: 1.35;
+      color: #6b5555;
+    }
+
+    .archive-photo-meta strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .archive-album-add-row {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .archive-album-add-row .archive-upload-button {
+      min-height: 36px;
+      padding: 7px 12px;
+      font-size: 12px;
+    }
+
+    .archive-unsorted {
+      margin-top: 20px;
+    }
+
+    .archive-unsorted h4 {
+      margin: 0 0 10px;
+      font-family: Georgia, serif;
+      color: #5f4b47;
+    }
+
+    .archive-unsorted-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .archive-empty {
+      text-align: center;
+      padding: 24px 12px;
+      color: #9a8585;
+      font-size: 13px;
+    }
+
+    @media (max-width: 500px) {
+      .archive-album-photos { gap: 6px; }
+      .archive-album-card { padding: 12px; }
+    }
+
     .coming-soon {
       text-align: center;
       margin-top: 80px;
@@ -1202,10 +1368,25 @@ transform: translate(-50%, 0) scale(1);
     </a>
 
 
-    <div class="coming-soon">
+    <div class="archive-photos-section">
+      <div class="archive-photos-header">
+        <div>
+          <h3>📸 Memories</h3>
+          <p class="section-note">Create an album and choose up to three best photos.</p>
+        </div>
 
-      More memories will be added here ♡
+        <button type="button" id="createAlbumButton" class="archive-create-button">＋ Create Album</button>
+      </div>
 
+      <div id="archivePhotoStatus" class="archive-photo-status" style="display:none;"></div>
+      <div id="archiveAlbumGallery" class="archive-album-grid">
+        <div class="archive-empty">No albums yet ♡</div>
+      </div>
+
+      <div id="archiveUnsortedSection" class="archive-unsorted" style="display:none;">
+        <h4>Photos</h4>
+        <div id="archiveUnsortedGallery" class="archive-unsorted-gallery"></div>
+      </div>
     </div>
 
   </section>
@@ -1266,7 +1447,6 @@ import {
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
 
 /* =========================
    Firebase
@@ -1365,7 +1545,284 @@ function enterArchive(person) {
 
 
 /* =========================
+   Archive Albums & Photos
+========================= */
+
+function sanitizeArchiveText(value) {
+  return String(value || "").replace(/[<>]/g, "");
+}
+
+async function loadArchiveAlbums() {
+  const gallery = document.getElementById("archiveAlbumGallery");
+  const unsortedSection = document.getElementById("archiveUnsortedSection");
+  const unsortedGallery = document.getElementById("archiveUnsortedGallery");
+  if (!gallery) return;
+
+  try {
+    const [albumSnapshot, photoSnapshot] = await Promise.all([
+      getDocs(collection(db, "archiveAlbums")),
+      getDocs(collection(db, "archivePhotos"))
+    ]);
+
+    const albums = [];
+    const photos = [];
+
+    albumSnapshot.forEach(function(snap) {
+      albums.push({ id: snap.id, ...snap.data() });
+    });
+
+    photoSnapshot.forEach(function(snap) {
+      photos.push({ id: snap.id, ...snap.data() });
+    });
+
+    albums.sort(function(a, b) {
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
+
+    photos.sort(function(a, b) {
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
+
+    if (!albums.length) {
+      gallery.innerHTML = '<div class="archive-empty">No albums yet ♡</div>';
+    } else {
+      gallery.innerHTML = albums.map(function(album) {
+        const albumPhotos = photos
+          .filter(function(photo) { return photo.albumId === album.id; })
+          .sort(function(a, b) { return (a.createdAt || 0) - (b.createdAt || 0); });
+
+        const count = albumPhotos.length;
+        const remaining = Math.max(0, 3 - count);
+        const title = sanitizeArchiveText(album.name || "Untitled album");
+        const addedBy = sanitizeArchiveText(album.createdBy || "Us");
+
+        const photoHtml = albumPhotos.map(function(photo) {
+          const name = sanitizeArchiveText(photo.name || "Photo");
+          return `
+            <div class="archive-photo-card">
+              <a href="${photo.url}" target="_blank" rel="noopener noreferrer">
+                <img src="${photo.url}" alt="${name}">
+              </a>
+              <div class="archive-photo-meta">
+                <strong>♡ Memory</strong>
+                Added by ${sanitizeArchiveText(photo.addedBy || addedBy)}
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        const inputId = "archiveAlbumInput_" + album.id;
+        const addButton = remaining > 0
+          ? `
+            <div class="archive-album-add-row">
+              <label class="archive-upload-button" for="${inputId}">📸 Add three best photos</label>
+              <input id="${inputId}" type="file" accept="image/*" multiple style="display:none;" data-album-id="${album.id}">
+            </div>
+          `
+          : `
+            <div class="archive-album-count">This album is full ♡</div>
+          `;
+
+        return `
+          <div class="archive-album-card">
+            <div class="archive-album-head">
+              <h4 class="archive-album-title">${title}</h4>
+              <div class="archive-album-count">${count} / 3 photos</div>
+            </div>
+            <div class="archive-album-photos">
+              ${photoHtml || '<div class="archive-empty" style="grid-column:1/-1;padding:18px 6px;">Add up to three photos ♡</div>'}
+            </div>
+            ${addButton}
+          </div>
+        `;
+      }).join("");
+    }
+
+    const unsorted = photos.filter(function(photo) { return !photo.albumId; });
+    if (unsortedSection && unsortedGallery) {
+      if (unsorted.length) {
+        unsortedSection.style.display = "block";
+        unsortedGallery.innerHTML = unsorted.map(function(photo) {
+          const name = sanitizeArchiveText(photo.name || "Photo");
+          return `
+            <div class="archive-photo-card">
+              <a href="${photo.url}" target="_blank" rel="noopener noreferrer">
+                <img src="${photo.url}" alt="${name}">
+              </a>
+              <div class="archive-photo-meta">
+                <strong>♡ Memory</strong>
+                Added by ${sanitizeArchiveText(photo.addedBy || "Us")}
+              </div>
+            </div>
+          `;
+        }).join("");
+      } else {
+        unsortedSection.style.display = "none";
+        unsortedGallery.innerHTML = "";
+      }
+    }
+
+    document.querySelectorAll('input[data-album-id^=""]').forEach(function(input) {
+      input.addEventListener("change", function(event) {
+        uploadArchiveAlbumPhotos(event.target.dataset.albumId, event.target.files);
+        event.target.value = "";
+      });
+    });
+  } catch (error) {
+    console.error("Archive album load error:", error);
+    gallery.innerHTML = '<div class="archive-empty">Could not load your photos ♡</div>';
+  }
+}
+
+async function createArchiveAlbum() {
+  const name = prompt("Album name ♡");
+  if (name === null) return;
+
+  const cleanName = name.trim();
+  if (!cleanName) {
+    alert("Please enter an album name ♡");
+    return;
+  }
+
+  const person = document.body.dataset.person || "Us";
+
+  try {
+    await addDoc(collection(db, "archiveAlbums"), {
+      name: cleanName,
+      createdBy: person,
+      createdAt: Date.now()
+    });
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive album create error:", error);
+    alert(
+      "The album could not be created ♡\n\n" +
+      (error?.code || "unknown-error") + "\n" +
+      (error?.message || "")
+    );
+  }
+}
+
+function compressArchivePhoto(file, maxDimension = 1400, quality = 0.72) {
+  return new Promise(function(resolve, reject) {
+    const reader = new FileReader();
+
+    reader.onload = function() {
+      const image = new Image();
+      image.onload = function() {
+        try {
+          const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+          const width = Math.max(1, Math.round(image.naturalWidth * scale));
+          const height = Math.max(1, Math.round(image.naturalHeight * scale));
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d", { alpha: false });
+          ctx.drawImage(image, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+          // Keep each Firestore document comfortably below Firestore's 1 MiB limit.
+          if (dataUrl.length > 900000) {
+            const smaller = canvas.toDataURL("image/jpeg", 0.55);
+            if (smaller.length > 900000) {
+              reject(new Error("This photo is still too large after compression. Please choose a smaller photo."));
+              return;
+            }
+            resolve(smaller);
+            return;
+          }
+
+          resolve(dataUrl);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      image.onerror = function() {
+        reject(new Error("This image could not be read."));
+      };
+      image.src = reader.result;
+    };
+
+    reader.onerror = function() {
+      reject(new Error("This image could not be loaded."));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadArchiveAlbumPhotos(albumId, files) {
+  const status = document.getElementById("archivePhotoStatus");
+  if (!albumId || !files || !files.length || !status) return;
+
+  try {
+    const snapshot = await getDocs(collection(db, "archivePhotos"));
+    const currentCount = snapshot.docs.filter(function(snap) {
+      return snap.data().albumId === albumId;
+    }).length;
+
+    const imageFiles = Array.from(files).filter(function(file) {
+      return file.type && file.type.startsWith("image/");
+    });
+
+    const remaining = 3 - currentCount;
+    if (remaining <= 0) {
+      alert("This album already has three photos ♡");
+      return;
+    }
+
+    if (imageFiles.length > remaining) {
+      alert(`This album can only have ${remaining} more photo${remaining === 1 ? "" : "s"} ♡`);
+      return;
+    }
+
+    const person = document.body.dataset.person || "Us";
+    status.style.display = "block";
+    status.textContent = `Adding ${imageFiles.length} photo${imageFiles.length === 1 ? "" : "s"}… ♡`;
+
+    let uploaded = 0;
+    for (const file of imageFiles) {
+      const dataUrl = await compressArchivePhoto(file);
+
+      await addDoc(collection(db, "archivePhotos"), {
+        url: dataUrl,
+        name: file.name,
+        addedBy: person,
+        albumId: albumId,
+        createdAt: Date.now()
+      });
+
+      uploaded += 1;
+      status.textContent = `Adding ${uploaded} / ${imageFiles.length}… ♡`;
+    }
+
+    status.textContent = "Photos added to the album ♡";
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive photo upload error:", error);
+    status.textContent = "Photo upload failed ♡";
+    alert(
+      "The photos could not be added ♡\n\n" +
+      (error?.code || "unknown-error") + "\n" +
+      (error?.message || "")
+    );
+  } finally {
+    setTimeout(function() {
+      status.style.display = "none";
+    }, 2500);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  const createButton = document.getElementById("createAlbumButton");
+  if (createButton) {
+    createButton.addEventListener("click", createArchiveAlbum);
+  }
+});
+
+/* =========================
    Menu
+
 ========================= */
 
 window.openMenu = function() {
@@ -1455,6 +1912,9 @@ window.showPage = function(pageId) {
 }
   if (pageId === "trash") {
   loadTrash();
+}
+  if (pageId === "archive") {
+  loadArchivePhotos();
 }
 
   closeMenu();
