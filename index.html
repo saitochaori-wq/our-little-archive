@@ -4631,35 +4631,23 @@ window.openLoveMusicSend = async function() {
   try {
     const sentAt = Date.now();
 
-    // 1〜5分後のランダムな配達時間を決める
-    const randomDelay =
-      (1 + Math.random() * 4) * 60 * 1000;
+await addDoc(collection(db, "futureLove"), {
+  from: from,
+  to: to,
+  text: "",
+  spotifyUrl: cleanUrl,
+  spotifyEmbedUrl: embedUrl,
+  createdAt: sentAt,
+  deliverAt: sentAt,
+  delivered: false,
+  cancelled: false,
+  savedToDiary: false,
+  trashed: false,
+  kind: "music"
+});
 
-    const deliverAt = sentAt + randomDelay;
-
-    await addDoc(collection(db, "futureLove"), {
-      from: from,
-      to: to,
-      text: "",
-      spotifyUrl: cleanUrl,
-      spotifyEmbedUrl: embedUrl,
-      createdAt: sentAt,
-      deliverAt: deliverAt,
-      delivered: false,
-      cancelled: false,
-      savedToDiary: false,
-      trashed: false,
-      kind: "music"
-    });
-
-    const minutes = Math.ceil(randomDelay / 60000);
-
-    alert(
-      `Your song has been sent ♡\nIt will arrive in about ${minutes} minute${minutes === 1 ? "" : "s"}.`
-    );
-
-    // 配達時間になるまで待つため、ここでは即時チェックしない
-    await checkFutureLove();
+alert("Your song has been sent ♡\nIt will arrive right away.");
+await checkFutureLove();
   } catch (error) {
     console.error("Send Music error:", error);
     alert(
