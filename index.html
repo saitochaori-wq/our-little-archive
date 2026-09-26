@@ -2506,7 +2506,19 @@ function applyHomeReveal(progress, direction) {
   const state = window.partnerWeatherState;
   // PC arrows use one consistent motion: reveal from the left, return to the left.
   // Mobile swipes keep their original direction metadata for accessibility/state.
-  const x = -42 * (1 - p);
+  // The travel direction controls which side the partner information enters/exits.
+  // Mobile: left swipe reveals from the right; right swipe hides to the right.
+  // Desktop keeps the original left-entry reveal behavior for the PC arrows/click.
+  let x = -42 * (1 - p);
+  if (window.matchMedia && window.matchMedia("(max-width: 600px)").matches) {
+    if (dir === "left") {
+      // Reveal while swiping left: start on the right and slide inward.
+      x = 42 * (1 - p);
+    } else if (dir === "right") {
+      // Hide while swiping right: leave toward the right.
+      x = 42 * (1 - p);
+    }
+  }
   info.style.opacity = String(Math.min(1, p * 1.18));
   info.style.transform = `translateX(${x}px) translateY(${10 - p * 10}px)`;
 
@@ -2739,10 +2751,11 @@ function initHomeRevealSlider() {
     const distance = event.clientX - startX;
     const direction = distance >= 0 ? "right" : "left";
 
-    // Mobile is intentionally more sensitive: a short swipe can reveal the
-    // whole partner panel. About 120px of movement represents the full travel.
+    // Mobile direction is intentionally intuitive for the reveal gesture:
+    // swipe left -> reveal the partner information from the right;
+    // swipe right -> hide it toward the right.
     const travel = 120;
-    const nextProgress = startProgress + distance / travel;
+    const nextProgress = startProgress - distance / travel;
     setProgress(nextProgress, direction);
   });
 
@@ -2760,7 +2773,8 @@ function initHomeRevealSlider() {
     // This makes the mobile interaction feel much easier and more forgiving.
     if (Math.abs(distance) >= threshold) {
       const direction = distance >= 0 ? "right" : "left";
-      animateTo(direction === "right" ? 1 : 0, direction);
+      // Swipe right = hide; swipe left = reveal.
+      animateTo(direction === "right" ? 0 : 1, direction);
     } else {
       animateTo(startProgress, distance >= 0 ? "right" : "left");
     }
