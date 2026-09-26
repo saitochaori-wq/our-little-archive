@@ -1162,6 +1162,609 @@ transform: translate(-50%, 0) scale(1);
   transform: translateX(-42px);
   will-change: opacity, transform;
 }
+    /* =========================================================
+   Our Little Archive
+   Weather Background — Hybrid Version
+   ========================================================= */
+
+#home {
+  --weather-bg-top: #4f9bd0;
+  --weather-bg-bottom: #dce8ee;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Weather background base */
+#home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      var(--weather-bg-top),
+      var(--weather-bg-bottom)
+    );
+  transition:
+    background 1.2s ease,
+    opacity 1.2s ease;
+}
+
+/* -----------------------------------------
+   Weather layers
+   ----------------------------------------- */
+
+.weather-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* -----------------------------------------
+   Clear sky
+   ----------------------------------------- */
+
+.weather-sun {
+  position: absolute;
+  width: 118px;
+  height: 118px;
+  right: 14%;
+  top: 13%;
+  border-radius: 50%;
+  background: rgba(255,255,255,.98);
+  filter: blur(6px);
+  box-shadow:
+    0 0 30px 13px rgba(255,255,255,.58),
+    0 0 78px 34px rgba(255,255,255,.20);
+  opacity: 0;
+  animation: weatherSunBreath 6s ease-in-out infinite;
+}
+
+#home[data-weather="Clear"]::before {
+  background: #4f9bd0;
+}
+
+#home[data-weather="Clear"] .weather-sun {
+  opacity: 1;
+}
+
+/* 夜は太陽を完全に消す */
+#home[data-daypart="night"] .weather-sun,
+#home[data-daypart="late-night"] .weather-sun {
+  opacity: 0;
+}
+
+/* -----------------------------------------
+   Clouds
+   ----------------------------------------- */
+
+.weather-cloud {
+  position: absolute;
+  width: 340px;
+  height: 135px;
+  left: -390px;
+  background:
+    radial-gradient(
+      ellipse 45% 72% at 17% 72%,
+      rgba(255,255,255,.73) 0 48%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 43% 82% at 40% 54%,
+      rgba(255,255,255,.73) 0 49%,
+      transparent 51%
+    ),
+    radial-gradient(
+      ellipse 39% 68% at 65% 68%,
+      rgba(255,255,255,.73) 0 48%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 31% 55% at 87% 76%,
+      rgba(255,255,255,.73) 0 48%,
+      transparent 50%
+    );
+  filter: blur(7px);
+  opacity: 0;
+}
+
+.weather-cloud.a {
+  top: 9%;
+  animation: weatherCloud1 25s linear infinite;
+}
+
+.weather-cloud.b {
+  top: 25%;
+  transform: scale(.82);
+  animation:
+    weatherCloud2 34s linear infinite reverse;
+  animation-delay: -13s;
+}
+
+.weather-cloud.c {
+  top: 43%;
+  transform: scale(.65);
+  animation:
+    weatherCloud1 42s linear infinite;
+  animation-delay: -25s;
+}
+
+#home[data-weather="Cloudy"] .weather-cloud {
+  opacity: .78;
+}
+
+#home[data-weather="Rain"] .weather-cloud,
+#home[data-weather="Drizzle"] .weather-cloud,
+#home[data-weather="Showers"] .weather-cloud,
+#home[data-weather="Storm"] .weather-cloud {
+  opacity: .72;
+}
+
+/* 雪では雲を出さない */
+#home[data-weather="Snow"] .weather-cloud,
+#home[data-weather="Snow showers"] .weather-cloud {
+  opacity: 0;
+}
+
+/* -----------------------------------------
+   Fog
+   ----------------------------------------- */
+
+.weather-fog {
+  position: absolute;
+  left: -15%;
+  width: 130%;
+  height: 105px;
+  border-radius: 50%;
+  background: rgba(245,249,250,.31);
+  filter: blur(27px);
+  opacity: 0;
+  animation: weatherMist 9s ease-in-out infinite;
+}
+
+.weather-fog.a {
+  top: 39%;
+}
+
+.weather-fog.b {
+  top: 58%;
+  height: 125px;
+  animation-delay: -3s;
+}
+
+.weather-fog.c {
+  top: 76%;
+  height: 95px;
+  animation-delay: -6s;
+}
+
+#home[data-weather="Foggy"] .weather-fog {
+  opacity: .82;
+}
+
+#home[data-weather="Foggy"][data-daypart="night"] .weather-fog,
+#home[data-weather="Foggy"][data-daypart="late-night"] .weather-fog {
+  opacity: .94;
+  filter: blur(34px);
+}
+
+/* -----------------------------------------
+   Rain
+   ----------------------------------------- */
+
+.weather-rain {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-image:
+    repeating-linear-gradient(
+      105deg,
+      transparent 0 22px,
+      rgba(225,242,255,.58) 22px 24px,
+      transparent 24px 42px
+    );
+  background-size: 120px 150px;
+  animation: weatherRainFall 1.05s linear infinite;
+}
+
+#home[data-weather="Drizzle"] .weather-rain {
+  opacity: .55;
+}
+
+#home[data-weather="Rain"] .weather-rain {
+  opacity: 1;
+  background-image:
+    repeating-linear-gradient(
+      105deg,
+      transparent 0 18px,
+      rgba(230,244,255,.68) 18px 20px,
+      transparent 20px 36px
+    );
+  background-size: 100px 130px;
+  animation-duration: .72s;
+}
+
+#home[data-weather="Showers"] .weather-rain {
+  opacity: .82;
+  animation-duration: .65s;
+}
+
+#home[data-weather="Storm"] .weather-rain {
+  opacity: 1;
+  background-image:
+    repeating-linear-gradient(
+      105deg,
+      transparent 0 14px,
+      rgba(225,241,255,.75) 14px 16px,
+      transparent 16px 29px
+    );
+  background-size: 90px 120px;
+  animation-duration: .48s;
+}
+
+/* -----------------------------------------
+   Snow
+   ----------------------------------------- */
+
+.weather-snow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-image:
+    radial-gradient(
+      circle at 8% 12%,
+      rgba(255,255,255,.88) 0 3px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 23% 31%,
+      rgba(255,255,255,.72) 0 4px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 41% 18%,
+      rgba(255,255,255,.82) 0 3px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 57% 42%,
+      rgba(255,255,255,.70) 0 4px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 72% 24%,
+      rgba(255,255,255,.88) 0 3px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 88% 48%,
+      rgba(255,255,255,.76) 0 4px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 14% 67%,
+      rgba(255,255,255,.82) 0 3px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 34% 82%,
+      rgba(255,255,255,.74) 0 4px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 63% 72%,
+      rgba(255,255,255,.86) 0 3px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 82% 88%,
+      rgba(255,255,255,.72) 0 4px,
+      transparent 5px
+    );
+  background-size: 100% 100%;
+  animation: weatherSnowFall 7s linear infinite;
+}
+
+#home[data-weather="Snow"] .weather-snow,
+#home[data-weather="Snow showers"] .weather-snow {
+  opacity: .88;
+}
+
+/* -----------------------------------------
+   Night sky
+   ----------------------------------------- */
+
+.weather-stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(
+      circle at 7% 16%,
+      rgba(255,255,245,.98) 0 2px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 19% 31%,
+      rgba(255,255,245,.98) 0 3px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 34% 11%,
+      rgba(255,255,245,.98) 0 1.5px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 49% 26%,
+      rgba(255,255,245,.98) 0 2.5px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 64% 14%,
+      rgba(255,255,245,.98) 0 2px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 78% 34%,
+      rgba(255,255,245,.98) 0 3px,
+      transparent 5px
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(255,255,245,.98) 0 1.5px,
+      transparent 4px
+    );
+  filter: blur(1.2px);
+  box-shadow: 0 0 8px 2px rgba(255,255,235,.48);
+  animation: weatherStarsTwinkle 3.7s ease-in-out infinite alternate;
+}
+
+#home[data-daypart="night"] .weather-stars,
+#home[data-daypart="late-night"] .weather-stars {
+  opacity: .9;
+}
+
+/* -----------------------------------------
+   Moon
+   ----------------------------------------- */
+
+.weather-moon {
+  position: absolute;
+  width: 78px;
+  height: 78px;
+  right: 16%;
+  top: 15%;
+  border-radius: 50%;
+  background: rgba(255,255,230,.94);
+  box-shadow:
+    0 0 25px 9px rgba(255,255,220,.22),
+    0 0 55px 18px rgba(255,255,220,.10);
+  opacity: 0;
+  filter: blur(1.5px);
+}
+
+#home[data-daypart="night"] .weather-moon,
+#home[data-daypart="late-night"] .weather-moon {
+  opacity: .9;
+}
+
+/* -----------------------------------------
+   Storm
+   ----------------------------------------- */
+
+.weather-storm {
+  position: absolute;
+  inset: 0;
+  background: rgba(32,39,53,.24);
+  opacity: 0;
+}
+
+.weather-lightning {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,235,.72);
+  opacity: 0;
+}
+
+#home[data-weather="Storm"] .weather-storm {
+  opacity: 1;
+}
+
+#home[data-weather="Storm"] .weather-lightning {
+  animation: weatherLightning 5s infinite;
+}
+
+/* 雷雨以外では雷を完全に消す */
+#home:not([data-weather="Storm"]) .weather-lightning {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+/* -----------------------------------------
+   Weather colour states
+   ----------------------------------------- */
+
+#home[data-weather="Cloudy"]::before {
+  background: linear-gradient(
+    180deg,
+    #91b1c8,
+    #c8d3d9
+  );
+}
+
+#home[data-weather="Foggy"]::before {
+  background: linear-gradient(
+    180deg,
+    #b9c4c9,
+    #dce1e2
+  );
+}
+
+#home[data-weather="Drizzle"]::before,
+#home[data-weather="Rain"]::before {
+  background: linear-gradient(
+    180deg,
+    #718ca7,
+    #a9bac9
+  );
+}
+
+#home[data-weather="Showers"]::before {
+  background: linear-gradient(
+    180deg,
+    #617d99,
+    #9fb2c3
+  );
+}
+
+#home[data-weather="Storm"]::before {
+  background: linear-gradient(
+    180deg,
+    #3e465b,
+    #697086
+  );
+}
+
+#home[data-weather="Snow"]::before,
+#home[data-weather="Snow showers"]::before {
+  background: linear-gradient(
+    180deg,
+    #dce7ef,
+    #f4f7f9
+  );
+}
+
+#home[data-daypart="night"]::before,
+#home[data-daypart="late-night"]::before {
+  background: linear-gradient(
+    180deg,
+    #1c2948,
+    #303b5b
+  );
+}
+
+/* 夜の天気ごとの色 */
+#home[data-daypart="night"][data-weather="Rain"]::before,
+#home[data-daypart="late-night"][data-weather="Rain"]::before,
+#home[data-daypart="night"][data-weather="Showers"]::before,
+#home[data-daypart="late-night"][data-weather="Showers"]::before,
+#home[data-daypart="night"][data-weather="Drizzle"]::before,
+#home[data-daypart="late-night"][data-weather="Drizzle"]::before {
+  background: linear-gradient(
+    180deg,
+    #29374e,
+    #43536a
+  );
+}
+
+#home[data-daypart="night"][data-weather="Storm"]::before,
+#home[data-daypart="late-night"][data-weather="Storm"]::before {
+  background: linear-gradient(
+    180deg,
+    #1e2435,
+    #363c50
+  );
+}
+
+#home[data-daypart="night"][data-weather="Foggy"]::before,
+#home[data-daypart="late-night"][data-weather="Foggy"]::before {
+  background: linear-gradient(
+    180deg,
+    #404b57,
+    #66727b
+  );
+}
+
+/* -----------------------------------------
+   Animations
+   ----------------------------------------- */
+
+@keyframes weatherCloud1 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(100vw + 520px));
+  }
+}
+
+@keyframes weatherCloud2 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(100vw + 520px));
+  }
+}
+
+@keyframes weatherMist {
+  0%,100% {
+    transform: translateX(-4%);
+  }
+  50% {
+    transform: translateX(4%);
+  }
+}
+
+@keyframes weatherRainFall {
+  from {
+    background-position: 0 -120px;
+  }
+  to {
+    background-position: 120px 260px;
+  }
+}
+
+@keyframes weatherSnowFall {
+  from {
+    background-position: 0 -120px;
+  }
+  to {
+    background-position: 55px 360px;
+  }
+}
+
+@keyframes weatherSunBreath {
+  0%,100% {
+    transform: scale(.94);
+    opacity: .86;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes weatherStarsTwinkle {
+  0%,100% {
+    opacity: .72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes weatherLightning {
+  0%, 91%, 100% {
+    opacity: 0;
+  }
+  92% {
+    opacity: .72;
+  }
+  92.5% {
+    opacity: 0;
+  }
+  93% {
+    opacity: .42;
+  }
+  94% {
+    opacity: 0;
+  }
+}
 .home-weather-main { font-size: 23px; color: #4f3d3d; }
 .home-weather-sub { font-size: 15px; color: #786565; }
 .home-weather-note { font-size: 12px; color: #987e7e; margin-top: 4px; }
