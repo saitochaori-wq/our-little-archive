@@ -1514,7 +1514,7 @@ transform: translate(-50%, 0) scale(1);
           type="button"
           class="home-arrow"
           id="homeRevealPrev"
-          aria-label="Reveal your love's world"
+          aria-label="Open or close your love's world from the left"
         >
           ‹
         </button>
@@ -1552,7 +1552,7 @@ transform: translate(-50%, 0) scale(1);
           type="button"
           class="home-arrow"
           id="homeRevealNext"
-          aria-label="Hide your love's world"
+          aria-label="Open or close your love's world from the right"
         >
           ›
         </button>
@@ -2838,42 +2838,48 @@ function initHomeRevealSlider() {
     animationFrame = requestAnimationFrame(step);
   };
 
-  const toggleByDirection = (direction) => {
-    const target = progress < 0.5 ? 1 : 0;
+  // Each side controls the direction. When hidden, the information
+  // enters from the side that was clicked. When visible, it exits
+  // through the opposite side so the motion matches the user's action.
+  const toggleByButtonSide = (side) => {
+    const opening = progress < 0.5;
+    const target = opening ? 1 : 0;
+    const direction = opening
+      ? side
+      : (side === "left" ? "right" : "left");
     animateTo(target, direction);
   };
 
   if (prev) {
     prev.addEventListener("click", function() {
       if (isMobile()) return;
-      toggleByDirection("left");
+      toggleByButtonSide("left");
     });
   }
 
   if (next) {
     next.addEventListener("click", function() {
       if (isMobile()) return;
-      toggleByDirection("right");
+      toggleByButtonSide("right");
     });
   }
 
-  // PC text clicks also toggle the state; the half that was clicked
-  // determines which side the information travels toward/from.
+  // PC text clicks use the same side-based behavior as the arrows.
   copy.addEventListener("click", function(event) {
     if (isMobile()) return;
     const rect = copy.getBoundingClientRect();
     const clickedRightHalf = (event.clientX - rect.left) > (rect.width / 2);
-    toggleByDirection(clickedRightHalf ? "right" : "left");
+    toggleByButtonSide(clickedRightHalf ? "right" : "left");
   });
 
   copy.addEventListener("keydown", function(event) {
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      toggleByDirection("right");
+      toggleByButtonSide("right");
     }
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      toggleByDirection("left");
+      toggleByButtonSide("left");
     }
   });
 
