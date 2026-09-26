@@ -2504,8 +2504,9 @@ function applyHomeReveal(progress, direction) {
   copy.setAttribute("aria-valuenow", String(Math.round(p * 100)));
 
   const state = window.partnerWeatherState;
-  const origin = dir === "left" ? 42 : -42;
-  const x = origin * (1 - p);
+  // PC arrows use one consistent motion: reveal from the left, return to the left.
+  // Mobile swipes keep their original direction metadata for accessibility/state.
+  const x = -42 * (1 - p);
   info.style.opacity = String(Math.min(1, p * 1.18));
   info.style.transform = `translateX(${x}px) translateY(${10 - p * 10}px)`;
 
