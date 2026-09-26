@@ -771,6 +771,12 @@ transform: translate(-50%, 0) scale(1);
 .future-love-access #futureLoveButton{background:rgba(0,0,0,.58)!important;color:#fff!important;border:1px solid rgba(255,255,255,.28)!important;}
 .future-love-access #futureLoveButton:hover{background:rgba(0,0,0,.68)!important;color:#fff!important;}
 .future-love-panel,.future-love-panel h3,.future-love-panel p,.future-love-panel div,.future-love-panel button{color:#fff;}
+
+/* Requests God access */
+.request-god-access{display:none;position:fixed;right:22px;bottom:22px;z-index:9999;margin:0;}
+.request-god-access #requestGodButton{width:72px;height:72px;min-height:0;margin:0;padding:10px;border-radius:50%;font-size:11px;line-height:1.15;letter-spacing:0;color:#fff;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.28);box-shadow:0 6px 0 rgba(0,0,0,.35),0 10px 22px rgba(0,0,0,.22),inset 0 2px 0 rgba(255,255,255,.12);}
+.request-god-access #requestGodButton:hover{transform:translateY(-2px);background:rgba(0,0,0,.68);color:#fff;}
+.request-god-access #requestGodButton:active{transform:translateY(5px);background:rgba(0,0,0,.8);}
 </style>
 
 </head>
@@ -1135,6 +1141,10 @@ transform: translate(-50%, 0) scale(1);
       🌷 I'm ready
     </button>
 
+    <div class="request-god-access" id="requestGodAccess">
+      <button type="button" id="requestGodButton" class="love-button" aria-label="Are you God?">Are you<br>God?</button>
+    </div>
+
     <div id="talkInboxWrap" style="display:none;">
       <div class="mail-inbox-header">
         <h3>📥 I'm ready</h3>
@@ -1407,9 +1417,19 @@ window.goHome = function() {
   closeMenu();
 };
 
+window.requestGodUnlocked = false;
+
 window.showPage = function(pageId) {
 
   hideTalkInbox();
+
+  const requestGodAccess = document.getElementById("requestGodAccess");
+  if (requestGodAccess) {
+    requestGodAccess.style.display = pageId === "talk" ? "block" : "none";
+  }
+  if (pageId !== "talk") {
+    window.requestGodUnlocked = false;
+  }
 
   document
     .querySelectorAll(".page")
@@ -2204,10 +2224,14 @@ window.renderTalkInboxPage = function() {
     inbox.innerHTML = '<div class="coming-soon">No new messages yet ♡</div>';
   } else {
     inbox.innerHTML = '<div class="inbox-list">' + pageMessages.map(function(m) {
+      const deleteButton = window.requestGodUnlocked
+        ? `<div class="message-actions"><button type="button" class="future-love-cancel" onclick="deleteRequest('${m.id}')">🗑️ Delete Request</button></div>`
+        : '';
       return `
         <article class="love-item">
           <div class="love-text">${escapeHtml(m.text || "")}</div>
           <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
+          ${deleteButton}
         </article>`;
     }).join('') + '</div>';
   }
@@ -2266,6 +2290,66 @@ if (talkReadyButton) {
     window.talkInboxPage = 1;
     await checkFutureLove();
     await window.loadTalkInbox();
+  });
+}
+
+window.deleteRequest = async function(messageId) {
+  if (!window.requestGodUnlocked) {
+    alert("Please unlock this with Are you God? ♡");
+    return;
+  }
+
+  if (!confirm("Delete this request? ♡")) return;
+
+  const person = document.body.dataset.person;
+  try {
+    const ref = doc(db, "futureLove", messageId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      alert("This request could not be found ♡");
+      await window.loadTalkInbox();
+      return;
+    }
+
+    const data = snap.data();
+    if (data.kind !== "talk" || data.to !== person || data.cancelled || data.trashed) {
+      alert("This request cannot be deleted ♡");
+      await window.loadTalkInbox();
+      return;
+    }
+
+    // Hide it instead of deleting the document, so Firestore delete rules do not block it.
+    await updateDoc(ref, {
+      trashed: true,
+      deletedAt: Date.now()
+    });
+
+    await window.loadTalkInbox();
+    alert("Request deleted ♡");
+  } catch (error) {
+    console.error("Delete Request error:", error);
+    alert("Request deletion failed ♡\n\n" + (error?.code || "unknown-error") + "\n" + (error?.message || ""));
+  }
+};
+
+const requestGodButton = document.getElementById("requestGodButton");
+if (requestGodButton) {
+  requestGodButton.addEventListener("click", async function() {
+    const answer = prompt("Are you God?");
+    if (answer === null) return;
+
+    if (answer.trim().toLowerCase() !== "yes") {
+      alert("Access denied ♡");
+      return;
+    }
+
+    window.requestGodUnlocked = true;
+    const wrap = document.getElementById("talkInboxWrap");
+    if (wrap && wrap.style.display !== "none") {
+      await window.loadTalkInbox();
+    } else {
+      alert("God mode unlocked ♡ You can now delete requests from the Inbox.");
+    }
   });
 }
 
