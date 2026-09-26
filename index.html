@@ -694,6 +694,18 @@ transform: translate(-50%, 0) scale(1);
 
 
 
+/* Future Love access */
+
+.future-love-access{position:fixed;right:22px;bottom:22px;z-index:9999;margin:0;}
+.future-love-access #futureLoveButton{width:72px;height:72px;min-height:0;margin:0;padding:10px;border-radius:50%;font-size:11px;line-height:1.15;letter-spacing:0;box-shadow:0 6px 0 #d7b0b0, 0 10px 22px rgba(100,55,55,.22), inset 0 2px 0 rgba(255,255,255,.9);}
+.future-love-access #futureLoveButton:hover{transform:translateY(-2px);box-shadow:0 8px 0 #d7b0b0, 0 13px 25px rgba(100,55,55,.24), inset 0 2px 0 rgba(255,255,255,.95);}
+.future-love-access #futureLoveButton:active{transform:translateY(5px);box-shadow:0 1px 0 #d7b0b0, 0 5px 10px rgba(100,55,55,.15);}
+.future-love-panel{position:fixed;right:22px;bottom:108px;width:min(360px,calc(100vw - 44px));max-height:70vh;overflow:auto;margin:0;}
+.future-love-panel{margin-top:14px;padding:18px;border:1px solid rgba(255,255,255,.45);border-radius:20px;background:rgba(255,255,255,.55);}
+.future-love-card{padding:14px;margin:10px 0;border-radius:16px;background:rgba(255,255,255,.7);}
+.future-love-time{font-weight:700;margin:7px 0;}
+.future-love-cancel{border:0;border-radius:12px;padding:9px 13px;cursor:pointer;}
+
 /* Love Mail send button */
 .love-button {
   display: block;
@@ -1033,6 +1045,15 @@ transform: translate(-50%, 0) scale(1);
   <span class="paper-plane" aria-hidden="true">➤</span> Send a little love
 </button>
 
+
+<div class="future-love-access">
+  <button type="button" id="futureLoveButton" class="love-button" aria-label="Are you God?">Are you<br>God?</button>
+  <div id="futureLovePanel" class="future-love-panel" style="display:none;">
+    <h3>✨ Future Love</h3>
+    <p class="page-description">See when your little love is scheduled to arrive, or cancel it before it arrives.</p>
+    <div id="futureLoveList"></div>
+  </div>
+</div>
 
 <div class="mail-inbox-header">
   <h3>📥 Love Mail</h3>
@@ -1419,12 +1440,102 @@ window.openLoveSend = async function() {
 };
 
 // Send button: register the click directly so it always calls the function.
+const futureLoveButton = document.getElementById("futureLoveButton");
+if (futureLoveButton) {
+  futureLoveButton.addEventListener("click", function() {
+    window.openFutureLove();
+  });
+}
+
 const sendLoveButton = document.getElementById("sendLoveButton");
 if (sendLoveButton) {
   sendLoveButton.addEventListener("click", function() {
     window.openLoveSend();
   });
 }
+/* =========================
+   Future Love private view
+========================= */
+
+window.openFutureLove = async function() {
+  const answer = prompt("Are you God?");
+  if (answer === null) return;
+
+  if (answer.trim().toLowerCase() !== "yes") {
+    alert("Access denied ♡");
+    return;
+  }
+
+  const panel = document.getElementById("futureLovePanel");
+  panel.style.display = "block";
+  await loadFutureLove();
+};
+
+window.loadFutureLove = async function() {
+  const box = document.getElementById("futureLoveList");
+  const person = document.body.dataset.person;
+  box.innerHTML = "Checking your future loves... ♡";
+
+  try {
+    const snapshot = await getDocs(collection(db, "futureLove"));
+    const items = [];
+
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      if (m.from === person && !m.delivered && m.deliverAt > Date.now()) {
+        items.push({ id: snap.id, ...m });
+      }
+    });
+
+    items.sort((a,b) => a.deliverAt - b.deliverAt);
+
+    if (!items.length) {
+      box.innerHTML = '<div class="coming-soon">No scheduled love right now ♡</div>';
+      return;
+    }
+
+    box.innerHTML = items.map(function(m) {
+      return `
+        <article class="future-love-card">
+          <div class="love-text">${escapeHtml(m.text || "")}</div>
+          <div class="future-love-time">Arrives: ${new Date(m.deliverAt).toLocaleString("en-GB", {dateStyle:"medium", timeStyle:"short"})}</div>
+          <button type="button" class="future-love-cancel" onclick="cancelFutureLove('${m.id}')">↩ Cancel Send</button>
+        </article>`;
+    }).join("");
+  } catch (error) {
+    console.error(error);
+    box.innerHTML = '<div class="coming-soon">Could not open Future Love ♡</div>';
+  }
+};
+
+window.cancelFutureLove = async function(messageId) {
+  if (!confirm("Cancel this love before it arrives? ♡")) return;
+
+  const person = document.body.dataset.person;
+  try {
+    const ref = doc(db, "futureLove", messageId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      alert("This love could not be found ♡");
+      return;
+    }
+
+    const data = snap.data();
+    if (data.from !== person || data.delivered || data.deliverAt <= Date.now()) {
+      alert("This love can no longer be cancelled ♡");
+      await loadFutureLove();
+      return;
+    }
+
+    await deleteDoc(ref);
+    await loadFutureLove();
+    alert("Send cancelled ♡");
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong while cancelling this love.");
+  }
+};
+
 /* =========================
    Check Future Love (Notification)
 ========================= */
