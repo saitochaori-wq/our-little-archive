@@ -723,13 +723,41 @@ object-position: center top;
 
     .archive-album-add-row {
       display: flex;
-      justify-content: flex-end;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
     }
 
     .archive-album-add-row .archive-upload-button {
       min-height: 36px;
       padding: 7px 12px;
       font-size: 12px;
+      width: fit-content;
+      align-self: flex-end;
+    }
+
+    .archive-dropzone {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border: 1px dashed rgba(100,75,75,.28);
+      border-radius: 14px;
+      background: rgba(255,255,255,.36);
+      color: #765f5f;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: background .15s ease, border-color .15s ease, transform .15s ease;
+    }
+
+    .archive-dropzone:hover,
+    .archive-dropzone:focus-visible,
+    .archive-dropzone.drag-over {
+      background: rgba(255,255,255,.72);
+      border-color: rgba(100,75,75,.45);
+      transform: translateY(-1px);
     }
 
     .archive-unsorted {
@@ -1627,6 +1655,9 @@ async function loadArchiveAlbums() {
             <div class="archive-album-add-row">
               <label class="archive-upload-button" for="${inputId}">📸 Add three best photos</label>
               <input id="${inputId}" type="file" accept="image/*" multiple style="display:none;" data-album-id="${album.id}">
+              <div class="archive-dropzone" data-drop-album-id="${album.id}" tabindex="0">
+                <span>Drop photos here or paste a photo</span>
+              </div>
             </div>
           `
           : `
@@ -1634,7 +1665,7 @@ async function loadArchiveAlbums() {
           `;
 
         return `
-          <div class="archive-album-card">
+          <div class="archive-album-card" data-archive-card-id="${album.id}" tabindex="0">
             <div class="archive-album-head">
               <h4 class="archive-album-title">${title}</h4>
               <div class="archive-album-head-actions">
@@ -1660,6 +1691,71 @@ async function loadArchiveAlbums() {
       input.addEventListener("change", function(event) {
         uploadArchiveAlbumPhotos(event.target.dataset.albumId, event.target.files);
         event.target.value = "";
+      });
+    });
+
+    document.querySelectorAll('[data-drop-album-id]').forEach(function(zone) {
+      const setActive = function(active) {
+        zone.classList.toggle("drag-over", active);
+      };
+
+      zone.addEventListener("dragenter", function(event) {
+        event.preventDefault();
+        setActive(true);
+      });
+
+      zone.addEventListener("dragover", function(event) {
+        event.preventDefault();
+        setActive(true);
+      });
+
+      zone.addEventListener("dragleave", function(event) {
+        event.preventDefault();
+        if (!zone.contains(event.relatedTarget)) setActive(false);
+      });
+
+      zone.addEventListener("drop", function(event) {
+        event.preventDefault();
+        setActive(false);
+        const files = event.dataTransfer && event.dataTransfer.files;
+        uploadArchiveAlbumPhotos(zone.dataset.dropAlbumId, files);
+      });
+
+      zone.addEventListener("click", function() {
+        zone.focus();
+        const input = document.querySelector('input[data-album-id="' + zone.dataset.dropAlbumId + '"]');
+        if (input) input.click();
+      });
+
+      zone.addEventListener("paste", function(event) {
+        const items = event.clipboardData ? Array.from(event.clipboardData.items || []) : [];
+        const imageFiles = items
+          .filter(function(item) { return item.type && item.type.startsWith("image/"); })
+          .map(function(item) { return item.getAsFile(); })
+          .filter(Boolean);
+
+        if (!imageFiles.length) return;
+        event.preventDefault();
+        uploadArchiveAlbumPhotos(zone.dataset.dropAlbumId, imageFiles);
+      });
+    });
+
+    document.querySelectorAll('.archive-album-card').forEach(function(card) {
+      card.addEventListener("click", function() {
+        card.focus();
+      });
+
+      card.addEventListener("paste", function(event) {
+        const items = event.clipboardData ? Array.from(event.clipboardData.items || []) : [];
+        const imageFiles = items
+          .filter(function(item) { return item.type && item.type.startsWith("image/"); })
+          .map(function(item) { return item.getAsFile(); })
+          .filter(Boolean);
+
+        if (!imageFiles.length) return;
+        event.preventDefault();
+        const input = card.querySelector('input[data-album-id]');
+        if (input) uploadArchiveAlbumPhotos(input.dataset.albumId, imageFiles);
       });
     });
 
