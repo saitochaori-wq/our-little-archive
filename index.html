@@ -700,7 +700,7 @@ transform: translate(-50%, 0) scale(1);
 .future-love-access #futureLoveButton{width:72px;height:72px;min-height:0;margin:0;padding:10px;border-radius:50%;font-size:11px;line-height:1.15;letter-spacing:0;color:#fff;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.25);box-shadow:0 6px 0 rgba(0,0,0,.35), 0 10px 22px rgba(0,0,0,.22), inset 0 2px 0 rgba(255,255,255,.12);}
 .future-love-access #futureLoveButton:hover{transform:translateY(-2px);background:rgba(0,0,0,.82);box-shadow:0 8px 0 rgba(0,0,0,.4), 0 13px 25px rgba(0,0,0,.25), inset 0 2px 0 rgba(255,255,255,.14);}
 .future-love-access #futureLoveButton:active{transform:translateY(5px);background:rgba(0,0,0,.86);box-shadow:0 1px 0 rgba(0,0,0,.45), 0 5px 10px rgba(0,0,0,.18);}
-.future-love-panel{position:fixed;right:22px;bottom:108px;width:min(360px,calc(100vw - 44px));max-height:70vh;overflow:auto;margin:0;}
+.future-love-panel{position:fixed;right:22px;bottom:108px;width:min(360px,calc(100vw - 44px));max-height:70vh;overflow:auto;margin:0;background:rgba(0,0,0,.72);color:#fff;border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}.future-love-panel h3,.future-love-panel p,.future-love-panel div,.future-love-panel span{color:#fff;}
 .future-love-close{position:absolute;top:8px;left:10px;width:32px;height:32px;border:0;border-radius:50%;background:rgba(0,0,0,.10);color:#333;font-size:25px;line-height:28px;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
 .future-love-close:hover{background:rgba(0,0,0,.18);}
 .future-love-panel h3{padding-left:28px;}
@@ -2190,40 +2190,51 @@ window.deleteLoveFromBook = async function(savedDocId) {
   const person = document.body.dataset.person;
 
   try {
-    const snapshot = await getDocs(collection(db, "savedLove"));
-    let found = null;
-
-    snapshot.forEach(function(snap) {
-      if (snap.id === savedDocId) {
-        const item = snap.data();
-        if (item.person === person) {
-          found = { id: snap.id, ...item };
-        }
-      }
-    });
-
-    if (!found) {
+    if (!savedDocId) {
       alert("This little love could not be found ♡");
       return;
     }
 
-    await addDoc(collection(db, "trashLove"), {
+    const savedRef = doc(db, "savedLove", savedDocId);
+    const savedSnap = await getDoc(savedRef);
+
+    if (!savedSnap.exists()) {
+      alert("This little love could not be found ♡");
+      await loadBook();
+      return;
+    }
+
+    const found = { id: savedSnap.id, ...savedSnap.data() };
+
+    if (found.person !== person) {
+      alert("This little love does not belong to this diary ♡");
+      return;
+    }
+
+    const trashData = {
       person: found.person,
-      loveId: found.loveId,
-      from: found.from,
-      message: found.message,
-      date: found.date,
-      savedAt: found.savedAt,
+      loveId: found.loveId || "",
+      from: found.from || "",
+      message: found.message || "",
+      date: found.date || new Date().toISOString(),
+      savedAt: found.savedAt || new Date().toISOString(),
       source: found.source || "savedLove",
       originalSavedLoveId: found.id,
       deletedAt: new Date().toISOString()
-    });
+    };
 
-    await deleteDoc(doc(db, "savedLove", found.id));
+    // First copy it to Trash. Only delete the Diary copy after the Trash copy succeeds.
+    await addDoc(collection(db, "trashLove"), trashData);
+    await deleteDoc(savedRef);
     await loadBook();
   } catch (error) {
-    console.error(error);
-    alert("Something went wrong while moving this love to Trash.");
+    console.error("Diary Remove error:", error);
+    alert(
+      "Remove failed ♡\n\n" +
+      (error && error.code ? error.code : "unknown-error") +
+      "\n\n" +
+      (error && error.message ? error.message : "Please try again.")
+    );
   }
 };
 
