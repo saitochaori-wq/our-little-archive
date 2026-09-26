@@ -1656,11 +1656,11 @@ async function loadArchiveAlbums() {
           ? `
             <div class="archive-album-add-row">
               <label class="archive-upload-button" for="${inputId}">📷 Add three best photos</label>
-              <input id="${inputId}" type="file" accept="image/*" multiple style="display:none;" data-album-id="${album.id}">
+              <input id="${inputId}" type="file" accept="image/*,.heic,.heif" multiple style="display:none;" data-album-id="${album.id}">
               <div class="archive-dropzone" data-drop-album-id="${album.id}" tabindex="0">
-                <span>Choose photos from your phone, or paste a photo</span>
+                <span>Choose photos from your phone, or paste an image</span>
               </div>
-              <div class="archive-mobile-hint">On iPhone or Android, tapping the photo button opens your photo picker ♡</div>
+              <div class="archive-mobile-hint">On your phone, tap the photo button to choose from your photos ♡</div>
             </div>
           `
           : `
@@ -1887,12 +1887,17 @@ async function uploadArchiveAlbumPhotos(albumId, files) {
     const currentPhotos = Array.isArray(album.photos) ? album.photos.slice(0, 3) : [];
     const remaining = 3 - currentPhotos.length;
 
+    const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "bmp", "tif", "tiff"];
     const imageFiles = Array.from(files).filter(function(file) {
-      return file.type && file.type.startsWith("image/");
+      const mimeIsImage = !!(file.type && file.type.toLowerCase().startsWith("image/"));
+      const fileName = String(file.name || "").toLowerCase();
+      const extension = fileName.includes(".") ? fileName.split(".").pop() : "";
+      const extensionIsImage = imageExtensions.includes(extension);
+      return mimeIsImage || extensionIsImage;
     });
 
     if (!imageFiles.length) {
-      alert("Please choose image files ♡");
+      alert("写真を選んでね ♡");
       return;
     }
 
