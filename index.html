@@ -988,6 +988,18 @@ transform: translate(-50%, 0) scale(1);
 
 
 
+/* Love Mail music send */
+.love-send-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.love-send-row #sendLoveButton{margin:0;}
+.love-send-choice{position:relative;display:flex;flex-direction:column;gap:10px;width:min(100%,360px);margin:10px auto 24px;padding:16px;border-radius:20px;background:rgba(255,255,255,.65);border:1px solid rgba(160,105,105,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.love-choice-button{width:100%;min-height:56px;border:1px solid rgba(160,105,105,.2);border-radius:16px;background:rgba(255,250,250,.9);color:#6d4545;font-size:16px;font-weight:700;cursor:pointer;padding:12px 18px;}
+.love-choice-button:hover{transform:translateY(-1px);}
+.love-choice-button .paper-plane{display:inline-block;transform:rotate(-35deg);margin-right:6px;}
+.love-choice-close{position:absolute;top:6px;right:8px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,255,255,.7);color:#6d4545;font-size:20px;line-height:26px;padding:0;cursor:pointer;}
+.spotify-card{margin-top:12px;padding:10px;border-radius:16px;background:rgba(255,255,255,.72);overflow:hidden;}
+.spotify-card iframe{display:block;width:100%;min-height:152px;border:0;border-radius:12px;}
+.spotify-fallback{display:inline-flex;margin-top:10px;align-items:center;justify-content:center;text-decoration:none;}
+
 /* Future Love access */
 
 .future-love-access{position:fixed;right:22px;bottom:22px;z-index:9999;margin:0;}
@@ -1354,13 +1366,25 @@ transform: translate(-50%, 0) scale(1);
   Little love messages that have arrived for you.
 </p>
 
-<button
-  id="sendLoveButton"
-  type="button"
-  class="love-button"
->
-  <span class="paper-plane" aria-hidden="true">➤</span> Send a little love
-</button>
+<div class="love-send-row">
+  <button
+    id="sendLoveButton"
+    type="button"
+    class="love-button"
+  >
+    <span class="paper-plane" aria-hidden="true">➤</span> Send a little love
+  </button>
+</div>
+
+<div id="loveSendChoice" class="love-send-choice" style="display:none;">
+  <button type="button" id="loveMessageChoiceButton" class="love-choice-button">
+    <span class="paper-plane" aria-hidden="true">➤</span> Write a message
+  </button>
+  <button type="button" id="loveMusicChoiceButton" class="love-choice-button">
+    🎵 Send music only
+  </button>
+  <button type="button" id="closeLoveSendChoice" class="love-choice-close" aria-label="Close">×</button>
+</div>
 
 
 <div class="future-love-access">
@@ -2328,6 +2352,73 @@ window.openLoveSend = async function() {
 
 };
 
+/* =========================
+   Send Music Only (Spotify)
+========================= */
+
+function getSpotifyEmbedUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    if (url.hostname !== "open.spotify.com" && url.hostname !== "www.open.spotify.com") return null;
+
+    const parts = url.pathname.split("/").filter(Boolean);
+    const types = new Set(["track", "album", "playlist", "episode", "show"]);
+    const typeIndex = parts.findIndex(function(part) { return types.has(part); });
+    if (typeIndex === -1 || !parts[typeIndex + 1]) return null;
+
+    const type = parts[typeIndex];
+    const id = parts[typeIndex + 1];
+    return `https://open.spotify.com/embed/${type}/${id}?utm_source=generator`;
+  } catch (error) {
+    return null;
+  }
+}
+
+window.openLoveMusicSend = async function() {
+  const from = document.body.dataset.person;
+
+  if (from !== "Shiori" && from !== "Kai") {
+    alert("Please choose your name first ♡");
+    return;
+  }
+
+  const to = from === "Kai" ? "Shiori" : "Kai";
+  const spotifyUrl = prompt("Paste a Spotify song link ♫");
+  if (spotifyUrl === null || spotifyUrl.trim() === "") return;
+
+  const cleanUrl = spotifyUrl.trim();
+  const embedUrl = getSpotifyEmbedUrl(cleanUrl);
+
+  if (!embedUrl) {
+    alert("Please paste a Spotify link from open.spotify.com ♡");
+    return;
+  }
+
+  try {
+    const deliverAt = randomFutureTime();
+
+    await addDoc(collection(db, "futureLove"), {
+      from: from,
+      to: to,
+      text: "",
+      spotifyUrl: cleanUrl,
+      spotifyEmbedUrl: embedUrl,
+      createdAt: Date.now(),
+      deliverAt: deliverAt,
+      delivered: false,
+      cancelled: false,
+      savedToDiary: false,
+      trashed: false,
+      kind: "music"
+    });
+
+    alert("Your song has been sent ♡\nIt will arrive sometime in the future.");
+  } catch (error) {
+    console.error("Send Music error:", error);
+    alert("Your song could not be sent ♡\n\n" + (error?.code || "Please check your Firebase connection."));
+  }
+};
+
 // Send button: register the click directly so it always calls the function.
 const futureLoveButton = document.getElementById("futureLoveButton");
 if (futureLoveButton) {
@@ -2337,9 +2428,34 @@ if (futureLoveButton) {
 }
 
 const sendLoveButton = document.getElementById("sendLoveButton");
-if (sendLoveButton) {
+const loveSendChoice = document.getElementById("loveSendChoice");
+const loveMessageChoiceButton = document.getElementById("loveMessageChoiceButton");
+const loveMusicChoiceButton = document.getElementById("loveMusicChoiceButton");
+const closeLoveSendChoice = document.getElementById("closeLoveSendChoice");
+
+if (sendLoveButton && loveSendChoice) {
   sendLoveButton.addEventListener("click", function() {
+    loveSendChoice.style.display = "flex";
+  });
+}
+
+if (loveMessageChoiceButton) {
+  loveMessageChoiceButton.addEventListener("click", function() {
+    if (loveSendChoice) loveSendChoice.style.display = "none";
     window.openLoveSend();
+  });
+}
+
+if (loveMusicChoiceButton) {
+  loveMusicChoiceButton.addEventListener("click", function() {
+    if (loveSendChoice) loveSendChoice.style.display = "none";
+    window.openLoveMusicSend();
+  });
+}
+
+if (closeLoveSendChoice) {
+  closeLoveSendChoice.addEventListener("click", function() {
+    if (loveSendChoice) loveSendChoice.style.display = "none";
   });
 }
 
@@ -2379,7 +2495,8 @@ window.loadFutureLove = async function() {
 
     snapshot.forEach(function(snap) {
       const m = snap.data();
-      if ((m.kind || "love") === "love" && m.from === person && !m.cancelled && !m.delivered && m.deliverAt > Date.now()) {
+      const kind = m.kind || "love";
+      if ((kind === "love" || kind === "music") && m.from === person && !m.cancelled && !m.delivered && m.deliverAt > Date.now()) {
         items.push({ id: snap.id, ...m });
       }
     });
@@ -2392,6 +2509,15 @@ window.loadFutureLove = async function() {
     }
 
     box.innerHTML = items.map(function(m) {
+      if (m.kind === "music") {
+        return `
+          <article class="future-love-card">
+            <div class="love-text">🎵 A song for you</div>
+            <div class="future-love-time">Arrives: ${new Date(m.deliverAt).toLocaleString("en-GB", {dateStyle:"medium", timeStyle:"short"})}</div>
+            <button type="button" class="future-love-cancel" onclick="cancelFutureLove('${m.id}')">↩ Cancel Send</button>
+          </article>`;
+      }
+
       return `
         <article class="future-love-card">
           <div class="love-text">${escapeHtml(m.text || m.message || "")}</div>
@@ -2454,7 +2580,7 @@ async function checkFutureLove() {
     if (
       !data.cancelled &&
       !data.delivered &&
-      (kind === "love" || kind === "talk") &&
+      (kind === "love" || kind === "talk" || kind === "music") &&
       data.deliverAt <= now &&
       data.to === document.body.dataset.person
     ) {
@@ -2479,7 +2605,9 @@ box.className = "love-notification";
 
 const notificationText = kind === "talk"
   ? "🌱 You received a new request ♡"
-  : "💌 You received a little love message ♡";
+  : kind === "music"
+    ? "🎵 You received a song ♡"
+    : "💌 You received a little love message ♡";
 
 box.innerHTML = `     <div class="love-notification-inner">
       ${notificationText}     </div>
@@ -3193,7 +3321,8 @@ window.loadInbox = async function() {
     const messages = [];
     snapshot.forEach(function(snap) {
       const m = snap.data();
-      if ((m.kind || "love") === "love" && m.to === person && !m.cancelled && m.delivered && !m.savedToDiary && !m.trashed) {
+      const kind = m.kind || "love";
+      if ((kind === "love" || kind === "music") && m.to === person && !m.cancelled && m.delivered && !m.savedToDiary && !m.trashed) {
         messages.push({ id: snap.id, ...m });
       }
     });
@@ -3205,6 +3334,17 @@ window.loadInbox = async function() {
     }
 
     inbox.innerHTML = '<div class="inbox-list">' + messages.map(function(m) {
+      if (m.kind === "music") {
+        const embedUrl = m.spotifyEmbedUrl || getSpotifyEmbedUrl(m.spotifyUrl || "");
+        const safeSpotifyUrl = escapeHtml(m.spotifyUrl || "");
+        return `
+          <article class="love-item">
+            <div class="love-text">🎵 A song for you</div>
+            <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
+            ${embedUrl ? `<div class="spotify-card"><iframe src="${embedUrl}" title="Spotify player" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe><a class="book-save-button spotify-fallback" href="${safeSpotifyUrl}" target="_blank" rel="noopener">🎵 Open in Spotify</a></div>` : `<a class="book-save-button spotify-fallback" href="${safeSpotifyUrl}" target="_blank" rel="noopener">🎵 Open in Spotify</a>`}
+          </article>`;
+      }
+
       return `
         <article class="love-item">
           <div class="love-text">${escapeHtml(m.text || "")}</div>
@@ -3235,7 +3375,8 @@ window.saveFutureLoveToDiary = async function(messageId) {
       person: person,
       loveId: message.id,
       from: message.from,
-      message: message.text,
+      message: message.kind === "music" ? "🎵 Spotify song" : (message.text || ""),
+      spotifyUrl: message.spotifyUrl || "",
       date: new Date(message.createdAt || Date.now()).toISOString(),
       savedAt: new Date().toISOString(),
       source: "futureLove"
