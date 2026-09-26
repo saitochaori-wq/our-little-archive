@@ -754,6 +754,8 @@ object-position: center top;
 
     .archive-dropzone:hover,
     .archive-dropzone:focus-visible,
+    .archive-mobile-hint{font-size:12px;opacity:.72;margin-top:6px;text-align:center;line-height:1.45;}
+
     .archive-dropzone.drag-over {
       background: rgba(255,255,255,.72);
       border-color: rgba(100,75,75,.45);
@@ -1653,11 +1655,12 @@ async function loadArchiveAlbums() {
         const addButton = remaining > 0
           ? `
             <div class="archive-album-add-row">
-              <label class="archive-upload-button" for="${inputId}">📸 Add three best photos</label>
+              <label class="archive-upload-button" for="${inputId}">📷 Add three best photos</label>
               <input id="${inputId}" type="file" accept="image/*" multiple style="display:none;" data-album-id="${album.id}">
               <div class="archive-dropzone" data-drop-album-id="${album.id}" tabindex="0">
-                <span>Drop photos here or paste a photo</span>
+                <span>Choose photos from your phone, or paste a photo</span>
               </div>
+              <div class="archive-mobile-hint">On iPhone or Android, tapping the photo button opens your photo picker ♡</div>
             </div>
           `
           : `
