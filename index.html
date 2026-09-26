@@ -663,6 +663,30 @@ object-position: center top;
       white-space: nowrap;
     }
 
+    .archive-album-delete-button {
+      border: 0;
+      background: transparent;
+      color: #8a6666;
+      font-size: 11px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .archive-album-delete-button:hover {
+      background: rgba(150,90,90,.10);
+      color: #6f4d4d;
+    }
+
+    .archive-album-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
     .archive-album-photos {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1375,7 +1399,7 @@ transform: translate(-50%, 0) scale(1);
           <p class="section-note">Create an album and choose up to three best photos.</p>
         </div>
 
-        <button type="button" id="createAlbumButton" class="archive-create-button">＋ Create Album</button>
+        <button type="button" id="createAlbumButton" class="archive-create-button" onclick="window.createArchiveAlbum()">＋ Create Album</button>
       </div>
 
       <div id="archivePhotoStatus" class="archive-photo-status" style="display:none;"></div>
@@ -1559,27 +1583,15 @@ async function loadArchiveAlbums() {
   if (!gallery) return;
 
   try {
-    const [albumSnapshot, photoSnapshot] = await Promise.all([
-      getDocs(collection(db, "archiveAlbums")),
-      getDocs(collection(db, "archivePhotos"))
-    ]);
-
+    const albumSnapshot = await getDocs(collection(db, "archiveAlbums"));
     const albums = [];
-    const photos = [];
 
     albumSnapshot.forEach(function(snap) {
-      albums.push({ id: snap.id, ...snap.data() });
-    });
-
-    photoSnapshot.forEach(function(snap) {
-      photos.push({ id: snap.id, ...snap.data() });
+      const data = snap.data() || {};
+      albums.push({ id: snap.id, ...data });
     });
 
     albums.sort(function(a, b) {
-      return (b.createdAt || 0) - (a.createdAt || 0);
-    });
-
-    photos.sort(function(a, b) {
       return (b.createdAt || 0) - (a.createdAt || 0);
     });
 
@@ -1587,10 +1599,7 @@ async function loadArchiveAlbums() {
       gallery.innerHTML = '<div class="archive-empty">No albums yet ♡</div>';
     } else {
       gallery.innerHTML = albums.map(function(album) {
-        const albumPhotos = photos
-          .filter(function(photo) { return photo.albumId === album.id; })
-          .sort(function(a, b) { return (a.createdAt || 0) - (b.createdAt || 0); });
-
+        const albumPhotos = Array.isArray(album.photos) ? album.photos.slice(0, 3) : [];
         const count = albumPhotos.length;
         const remaining = Math.max(0, 3 - count);
         const title = sanitizeArchiveText(album.name || "Untitled album");
@@ -1598,10 +1607,11 @@ async function loadArchiveAlbums() {
 
         const photoHtml = albumPhotos.map(function(photo) {
           const name = sanitizeArchiveText(photo.name || "Photo");
+          const src = photo.url || "";
           return `
             <div class="archive-photo-card">
-              <a href="${photo.url}" target="_blank" rel="noopener noreferrer">
-                <img src="${photo.url}" alt="${name}">
+              <a href="${src}" target="_blank" rel="noopener noreferrer">
+                <img src="${src}" alt="${name}">
               </a>
               <div class="archive-photo-meta">
                 <strong>♡ Memory</strong>
@@ -1627,7 +1637,10 @@ async function loadArchiveAlbums() {
           <div class="archive-album-card">
             <div class="archive-album-head">
               <h4 class="archive-album-title">${title}</h4>
-              <div class="archive-album-count">${count} / 3 photos</div>
+              <div class="archive-album-head-actions">
+                <div class="archive-album-count">${count} / 3 photos</div>
+                <button type="button" class="archive-album-delete-button" data-album-delete="${album.id}">🗑️ Delete</button>
+              </div>
             </div>
             <div class="archive-album-photos">
               ${photoHtml || '<div class="archive-empty" style="grid-column:1/-1;padding:18px 6px;">Add up to three photos ♡</div>'}
@@ -1638,41 +1651,49 @@ async function loadArchiveAlbums() {
       }).join("");
     }
 
-    const unsorted = photos.filter(function(photo) { return !photo.albumId; });
     if (unsortedSection && unsortedGallery) {
-      if (unsorted.length) {
-        unsortedSection.style.display = "block";
-        unsortedGallery.innerHTML = unsorted.map(function(photo) {
-          const name = sanitizeArchiveText(photo.name || "Photo");
-          return `
-            <div class="archive-photo-card">
-              <a href="${photo.url}" target="_blank" rel="noopener noreferrer">
-                <img src="${photo.url}" alt="${name}">
-              </a>
-              <div class="archive-photo-meta">
-                <strong>♡ Memory</strong>
-                Added by ${sanitizeArchiveText(photo.addedBy || "Us")}
-              </div>
-            </div>
-          `;
-        }).join("");
-      } else {
-        unsortedSection.style.display = "none";
-        unsortedGallery.innerHTML = "";
-      }
+      unsortedSection.style.display = "none";
+      unsortedGallery.innerHTML = "";
     }
 
-    document.querySelectorAll('input[data-album-id^=""]').forEach(function(input) {
+    document.querySelectorAll('input[data-album-id]').forEach(function(input) {
       input.addEventListener("change", function(event) {
         uploadArchiveAlbumPhotos(event.target.dataset.albumId, event.target.files);
         event.target.value = "";
       });
     });
+
+    document.querySelectorAll('[data-album-delete]').forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        deleteArchiveAlbum(event.currentTarget.dataset.albumDelete);
+      });
+    });
   } catch (error) {
     console.error("Archive album load error:", error);
-    gallery.innerHTML = '<div class="archive-empty">Could not load your photos ♡</div>';
+    gallery.innerHTML = '<div class="archive-empty">Could not load your albums ♡</div>';
   }
 }
+
+async function deleteArchiveAlbum(albumId) {
+  if (!albumId) return;
+
+  const confirmed = confirm("Delete this album and its photos? ♡");
+  if (!confirmed) return;
+
+  try {
+    await deleteDoc(doc(db, "archiveAlbums", albumId));
+    await loadArchiveAlbums();
+  } catch (error) {
+    console.error("Archive album delete error:", error);
+    alert(
+      "The album could not be deleted ♡\n\n" +
+      (error?.code || "unknown-error") + "\n" +
+      (error?.message || "")
+    );
+  }
+}
+
+window.deleteArchiveAlbum = deleteArchiveAlbum;
 
 async function createArchiveAlbum() {
   const name = prompt("Album name ♡");
@@ -1690,7 +1711,8 @@ async function createArchiveAlbum() {
     await addDoc(collection(db, "archiveAlbums"), {
       name: cleanName,
       createdBy: person,
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      photos: []
     });
     await loadArchiveAlbums();
   } catch (error) {
@@ -1703,7 +1725,10 @@ async function createArchiveAlbum() {
   }
 }
 
-function compressArchivePhoto(file, maxDimension = 1400, quality = 0.72) {
+window.createArchiveAlbum = createArchiveAlbum;
+
+
+function compressArchivePhoto(file, maxDimension = 1200, quality = 0.6) {
   return new Promise(function(resolve, reject) {
     const reader = new FileReader();
 
@@ -1719,16 +1744,11 @@ function compressArchivePhoto(file, maxDimension = 1400, quality = 0.72) {
           canvas.height = height;
           const ctx = canvas.getContext("2d", { alpha: false });
           ctx.drawImage(image, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL("image/jpeg", quality);
 
-          // Keep each Firestore document comfortably below Firestore's 1 MiB limit.
-          if (dataUrl.length > 900000) {
-            const smaller = canvas.toDataURL("image/jpeg", 0.55);
-            if (smaller.length > 900000) {
-              reject(new Error("This photo is still too large after compression. Please choose a smaller photo."));
-              return;
-            }
-            resolve(smaller);
+          let dataUrl = canvas.toDataURL("image/jpeg", quality);
+          if (dataUrl.length > 260000) dataUrl = canvas.toDataURL("image/jpeg", 0.42);
+          if (dataUrl.length > 260000) {
+            reject(new Error("This photo is too large after compression. Please choose a smaller photo."));
             return;
           }
 
@@ -1753,19 +1773,30 @@ function compressArchivePhoto(file, maxDimension = 1400, quality = 0.72) {
 
 async function uploadArchiveAlbumPhotos(albumId, files) {
   const status = document.getElementById("archivePhotoStatus");
-  if (!albumId || !files || !files.length || !status) return;
+  if (!albumId || !files || !files.length) return;
 
   try {
-    const snapshot = await getDocs(collection(db, "archivePhotos"));
-    const currentCount = snapshot.docs.filter(function(snap) {
-      return snap.data().albumId === albumId;
-    }).length;
+    const albumRef = doc(db, "archiveAlbums", albumId);
+    const albumSnap = await getDoc(albumRef);
+
+    if (!albumSnap.exists()) {
+      alert("This album could not be found ♡");
+      return;
+    }
+
+    const album = albumSnap.data() || {};
+    const currentPhotos = Array.isArray(album.photos) ? album.photos.slice(0, 3) : [];
+    const remaining = 3 - currentPhotos.length;
 
     const imageFiles = Array.from(files).filter(function(file) {
       return file.type && file.type.startsWith("image/");
     });
 
-    const remaining = 3 - currentCount;
+    if (!imageFiles.length) {
+      alert("Please choose image files ♡");
+      return;
+    }
+
     if (remaining <= 0) {
       alert("This album already has three photos ♡");
       return;
@@ -1777,30 +1808,32 @@ async function uploadArchiveAlbumPhotos(albumId, files) {
     }
 
     const person = document.body.dataset.person || "Us";
-    status.style.display = "block";
-    status.textContent = `Adding ${imageFiles.length} photo${imageFiles.length === 1 ? "" : "s"}… ♡`;
+    if (status) {
+      status.style.display = "block";
+      status.textContent = `Adding ${imageFiles.length} photo${imageFiles.length === 1 ? "" : "s"}… ♡`;
+    }
 
-    let uploaded = 0;
+    const newPhotos = [];
     for (const file of imageFiles) {
       const dataUrl = await compressArchivePhoto(file);
-
-      await addDoc(collection(db, "archivePhotos"), {
+      newPhotos.push({
         url: dataUrl,
         name: file.name,
         addedBy: person,
-        albumId: albumId,
         createdAt: Date.now()
       });
-
-      uploaded += 1;
-      status.textContent = `Adding ${uploaded} / ${imageFiles.length}… ♡`;
     }
 
-    status.textContent = "Photos added to the album ♡";
+    await updateDoc(albumRef, {
+      photos: currentPhotos.concat(newPhotos).slice(0, 3),
+      updatedAt: Date.now()
+    });
+
+    if (status) status.textContent = "Photos added to the album ♡";
     await loadArchiveAlbums();
   } catch (error) {
     console.error("Archive photo upload error:", error);
-    status.textContent = "Photo upload failed ♡";
+    if (status) status.textContent = "Photo upload failed ♡";
     alert(
       "The photos could not be added ♡\n\n" +
       (error?.code || "unknown-error") + "\n" +
@@ -1808,7 +1841,7 @@ async function uploadArchiveAlbumPhotos(albumId, files) {
     );
   } finally {
     setTimeout(function() {
-      status.style.display = "none";
+      if (status) status.style.display = "none";
     }, 2500);
   }
 }
