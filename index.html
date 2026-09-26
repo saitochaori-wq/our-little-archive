@@ -697,10 +697,14 @@ transform: translate(-50%, 0) scale(1);
 /* Future Love access */
 
 .future-love-access{position:fixed;right:22px;bottom:22px;z-index:9999;margin:0;}
-.future-love-access #futureLoveButton{width:72px;height:72px;min-height:0;margin:0;padding:10px;border-radius:50%;font-size:11px;line-height:1.15;letter-spacing:0;box-shadow:0 6px 0 #d7b0b0, 0 10px 22px rgba(100,55,55,.22), inset 0 2px 0 rgba(255,255,255,.9);}
-.future-love-access #futureLoveButton:hover{transform:translateY(-2px);box-shadow:0 8px 0 #d7b0b0, 0 13px 25px rgba(100,55,55,.24), inset 0 2px 0 rgba(255,255,255,.95);}
-.future-love-access #futureLoveButton:active{transform:translateY(5px);box-shadow:0 1px 0 #d7b0b0, 0 5px 10px rgba(100,55,55,.15);}
+.future-love-access #futureLoveButton{width:72px;height:72px;min-height:0;margin:0;padding:10px;border-radius:50%;font-size:11px;line-height:1.15;letter-spacing:0;color:#fff;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.25);box-shadow:0 6px 0 rgba(0,0,0,.35), 0 10px 22px rgba(0,0,0,.22), inset 0 2px 0 rgba(255,255,255,.12);}
+.future-love-access #futureLoveButton:hover{transform:translateY(-2px);background:rgba(0,0,0,.82);box-shadow:0 8px 0 rgba(0,0,0,.4), 0 13px 25px rgba(0,0,0,.25), inset 0 2px 0 rgba(255,255,255,.14);}
+.future-love-access #futureLoveButton:active{transform:translateY(5px);background:rgba(0,0,0,.86);box-shadow:0 1px 0 rgba(0,0,0,.45), 0 5px 10px rgba(0,0,0,.18);}
 .future-love-panel{position:fixed;right:22px;bottom:108px;width:min(360px,calc(100vw - 44px));max-height:70vh;overflow:auto;margin:0;}
+.future-love-close{position:absolute;top:8px;left:10px;width:32px;height:32px;border:0;border-radius:50%;background:rgba(0,0,0,.10);color:#333;font-size:25px;line-height:28px;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
+.future-love-close:hover{background:rgba(0,0,0,.18);}
+.future-love-panel h3{padding-left:28px;}
+
 .future-love-panel{margin-top:14px;padding:18px;border:1px solid rgba(255,255,255,.45);border-radius:20px;background:rgba(255,255,255,.55);}
 .future-love-card{padding:14px;margin:10px 0;border-radius:16px;background:rgba(255,255,255,.7);}
 .future-love-time{font-weight:700;margin:7px 0;}
@@ -1049,6 +1053,7 @@ transform: translate(-50%, 0) scale(1);
 <div class="future-love-access">
   <button type="button" id="futureLoveButton" class="love-button" aria-label="Are you God?">Are you<br>God?</button>
   <div id="futureLovePanel" class="future-love-panel" style="display:none;">
+    <button type="button" id="closeFutureLoveButton" class="future-love-close" aria-label="Close">×</button>
     <h3>✨ Future Love</h3>
     <p class="page-description">See when your little love is scheduled to arrive, or cancel it before it arrives.</p>
     <div id="futureLoveList"></div>
@@ -1424,6 +1429,7 @@ window.openLoveSend = async function() {
       createdAt: Date.now(),
       deliverAt: deliverAt,
       delivered: false,
+      cancelled: false,
       savedToDiary: false,
       trashed: false
     });
@@ -1452,6 +1458,14 @@ const sendLoveButton = document.getElementById("sendLoveButton");
 if (sendLoveButton) {
   sendLoveButton.addEventListener("click", function() {
     window.openLoveSend();
+  });
+}
+
+const closeFutureLoveButton = document.getElementById("closeFutureLoveButton");
+if (closeFutureLoveButton) {
+  closeFutureLoveButton.addEventListener("click", function() {
+    const panel = document.getElementById("futureLovePanel");
+    if (panel) panel.style.display = "none";
   });
 }
 /* =========================
@@ -1483,7 +1497,7 @@ window.loadFutureLove = async function() {
 
     snapshot.forEach(function(snap) {
       const m = snap.data();
-      if (m.from === person && !m.delivered && m.deliverAt > Date.now()) {
+      if (m.from === person && !m.cancelled && !m.delivered && m.deliverAt > Date.now()) {
         items.push({ id: snap.id, ...m });
       }
     });
@@ -1522,18 +1536,24 @@ window.cancelFutureLove = async function(messageId) {
     }
 
     const data = snap.data();
-    if (data.from !== person || data.delivered || data.deliverAt <= Date.now()) {
+    if (data.from !== person || data.cancelled || data.delivered || data.deliverAt <= Date.now()) {
       alert("This love can no longer be cancelled ♡");
       await loadFutureLove();
       return;
     }
 
-    await deleteDoc(ref);
+    // Keep the document and mark it cancelled instead of deleting it.
+    // This avoids permission errors caused by Firestore delete rules.
+    await updateDoc(ref, {
+      cancelled: true,
+      cancelledAt: Date.now()
+    });
+
     await loadFutureLove();
     alert("Send cancelled ♡");
   } catch (error) {
-    console.error(error);
-    alert("Something went wrong while cancelling this love.");
+    console.error("Cancel Future Love error:", error);
+    alert("Send cancellation failed ♡\n\n" + (error?.code || "unknown-error") + "\n" + (error?.message || ""));
   }
 };
 
@@ -1549,6 +1569,7 @@ for (const docSnap of snapshot.docs) {
 const data = docSnap.data();
 
 if (
+  !data.cancelled &&
   !data.delivered &&
   data.deliverAt <= now &&
   data.to === document.body.dataset.person
@@ -2075,7 +2096,7 @@ window.loadInbox = async function() {
     const messages = [];
     snapshot.forEach(function(snap) {
       const m = snap.data();
-      if (m.to === person && m.delivered && !m.savedToDiary && !m.trashed) {
+      if (m.to === person && !m.cancelled && m.delivered && !m.savedToDiary && !m.trashed) {
         messages.push({ id: snap.id, ...m });
       }
     });
