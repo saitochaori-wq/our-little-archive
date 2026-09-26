@@ -1098,10 +1098,29 @@ transform: translate(-50%, 0) scale(1);
 
     </p>
 
-    <div class="coming-soon">
+    <button
+      id="sendTalkButton"
+      type="button"
+      class="love-button"
+    >
+      <span class="paper-plane" aria-hidden="true">➤</span> Send a message
+    </button>
 
-      A safe place for us to talk.
+    <button
+      id="talkReadyButton"
+      type="button"
+      class="love-button"
+    >
+      🌷 I'm ready
+    </button>
 
+    <div id="talkInboxWrap" style="display:none;">
+      <div class="mail-inbox-header">
+        <h3>📥 I'm ready</h3>
+        <p>Your messages will appear here ♡</p>
+      </div>
+
+      <div id="talkInbox" class="love-message"></div>
     </div>
 
   </section>
@@ -1363,6 +1382,8 @@ window.goHome = function() {
 
 window.showPage = function(pageId) {
 
+  hideTalkInbox();
+
   document
     .querySelectorAll(".page")
     .forEach(function(page) {
@@ -1435,7 +1456,8 @@ window.openLoveSend = async function() {
       delivered: false,
       cancelled: false,
       savedToDiary: false,
-      trashed: false
+      trashed: false,
+      kind: "love"
     });
 
     alert("Your love has been sent ♡\nIt will arrive sometime in the future.");
@@ -1501,7 +1523,7 @@ window.loadFutureLove = async function() {
 
     snapshot.forEach(function(snap) {
       const m = snap.data();
-      if (m.from === person && !m.cancelled && !m.delivered && m.deliverAt > Date.now()) {
+      if ((m.kind || "love") === "love" && m.from === person && !m.cancelled && !m.delivered && m.deliverAt > Date.now()) {
         items.push({ id: snap.id, ...m });
       }
     });
@@ -1575,6 +1597,7 @@ const data = docSnap.data();
 if (
   !data.cancelled &&
   !data.delivered &&
+  (data.kind || "love") === "love" &&
   data.deliverAt <= now &&
   data.to === document.body.dataset.person
 ) {
@@ -2087,6 +2110,102 @@ bookMessages.onmouseup = function(e) {
 
 };
 /* =========================
+   Talk
+========================= */
+
+window.openTalkSend = async function() {
+  const from = document.body.dataset.person;
+
+  if (from !== "Shiori" && from !== "Kai") {
+    alert("Please choose your name first ♡");
+    return;
+  }
+
+  const to = from === "Kai" ? "Shiori" : "Kai";
+  const message = prompt("Write something you want to talk about ♡");
+
+  if (!message || message.trim() === "") return;
+
+  try {
+    const deliverAt = randomFutureTime();
+    await addDoc(collection(db, "futureLove"), {
+      from: from,
+      to: to,
+      text: message.trim(),
+      createdAt: Date.now(),
+      deliverAt: deliverAt,
+      delivered: false,
+      cancelled: false,
+      savedToDiary: false,
+      trashed: false,
+      kind: "talk"
+    });
+
+    alert("Your message has been sent ♡");
+  } catch (error) {
+    console.error("Send Talk error:", error);
+    alert("Your message could not be sent ♡\n\n" + (error?.code || "Please check your Firebase connection."));
+  }
+};
+
+window.loadTalkInbox = async function() {
+  const inbox = document.getElementById("talkInbox");
+  if (!inbox) return;
+  inbox.innerHTML = "Loading your messages... ♡";
+  const person = document.body.dataset.person;
+
+  try {
+    const snapshot = await getDocs(collection(db, "futureLove"));
+    const messages = [];
+    snapshot.forEach(function(snap) {
+      const m = snap.data();
+      if (m.kind === "talk" && m.to === person && !m.cancelled && m.delivered && !m.trashed) {
+        messages.push({ id: snap.id, ...m });
+      }
+    });
+    messages.sort((a,b) => (a.deliverAt || 0) - (b.deliverAt || 0));
+
+    if (!messages.length) {
+      inbox.innerHTML = '<div class="coming-soon">No new messages yet ♡</div>';
+      return;
+    }
+
+    inbox.innerHTML = '<div class="inbox-list">' + messages.map(function(m) {
+      return `
+        <article class="love-item">
+          <div class="love-text">${escapeHtml(m.text || "")}</div>
+          <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
+        </article>`;
+    }).join('') + '</div>';
+  } catch (error) {
+    console.error(error);
+    inbox.innerHTML = '<div class="coming-soon">Could not open your messages ♡</div>';
+  }
+};
+
+function hideTalkInbox() {
+  const wrap = document.getElementById("talkInboxWrap");
+  if (wrap) wrap.style.display = "none";
+}
+
+const sendTalkButton = document.getElementById("sendTalkButton");
+if (sendTalkButton) {
+  sendTalkButton.addEventListener("click", function() {
+    window.openTalkSend();
+  });
+}
+
+const talkReadyButton = document.getElementById("talkReadyButton");
+if (talkReadyButton) {
+  talkReadyButton.addEventListener("click", async function() {
+    const wrap = document.getElementById("talkInboxWrap");
+    if (!wrap) return;
+    wrap.style.display = "block";
+    await window.loadTalkInbox();
+  });
+}
+
+/* =========================
    New Inbox → Diary → Trash system
 ========================= */
 
@@ -2100,7 +2219,7 @@ window.loadInbox = async function() {
     const messages = [];
     snapshot.forEach(function(snap) {
       const m = snap.data();
-      if (m.to === person && !m.cancelled && m.delivered && !m.savedToDiary && !m.trashed) {
+      if ((m.kind || "love") === "love" && m.to === person && !m.cancelled && m.delivered && !m.savedToDiary && !m.trashed) {
         messages.push({ id: snap.id, ...m });
       }
     });
