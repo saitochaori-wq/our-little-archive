@@ -1079,7 +1079,7 @@ transform: translate(-50%, 0) scale(1);
 
 
 /* =========================
-   Home — partner weather reveal
+   Home — reveal partner world
 ========================= */
 .home {
   position: relative;
@@ -1096,104 +1096,105 @@ transform: translate(-50%, 0) scale(1);
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 18% 8%, rgba(var(--scene-top), calc(var(--scene-alpha) * .84)), transparent 50%),
-    radial-gradient(circle at 84% 28%, rgba(var(--scene-color), calc(var(--scene-alpha) * .28)), transparent 48%),
-    linear-gradient(180deg, rgba(var(--scene-top), calc(var(--scene-alpha) * .34)), rgba(var(--scene-bottom), var(--scene-alpha)));
-  transition: background .18s linear;
+    radial-gradient(circle at 18% 8%, rgba(var(--scene-top), calc(var(--scene-alpha) * .88)), transparent 52%),
+    radial-gradient(circle at 84% 26%, rgba(var(--scene-color), calc(var(--scene-alpha) * .34)), transparent 50%),
+    linear-gradient(180deg, rgba(var(--scene-top), calc(var(--scene-alpha) * .40)), rgba(var(--scene-bottom), var(--scene-alpha)));
 }
 .home-content {
   position: relative;
   z-index: 2;
-  width: min(560px, 100%);
+  width: min(900px, 100%);
 }
-.home h1 { position: relative; z-index: 2; }
-.home-scene-card {
+.home-reveal-shell {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: 10px;
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+.home-reveal-copy {
   position: relative;
-  margin: 26px auto 0;
-  width: min(420px, 100%);
-  padding: 22px 20px 18px;
-  border-radius: 26px;
-  background: rgba(255,255,255,.64);
-  border: 1px solid rgba(120,90,70,.10);
-  box-shadow: 0 12px 30px rgba(80,55,45,.10), inset 0 1px 0 rgba(255,255,255,.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  overflow: hidden;
-}
-.scene-label {
-  font-size: 12px;
-  color: #8a7070;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-.home-reveal-slider {
-  position: relative;
-  width: 100%;
-  height: 58px;
-  margin: 8px 0 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.78);
-  border: 1px solid rgba(125,95,85,.12);
-  box-shadow: inset 0 2px 6px rgba(90,60,50,.08);
-  touch-action: none;
+  min-height: 300px;
+  padding: 28px 28px 22px;
+  border-radius: 28px;
   user-select: none;
   -webkit-user-select: none;
-  cursor: grab;
+  cursor: pointer;
 }
-.home-reveal-slider.dragging { cursor: grabbing; }
-.home-reveal-fill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(255,223,229,.80), rgba(205,221,238,.84));
+.home-reveal-copy[role="slider"] { outline: none; }
+.home-reveal-copy h1 {
+  margin: 0 0 15px;
+  font-size: 42px;
+  font-weight: normal;
 }
-.home-reveal-track-text {
+.home-reveal-copy > p {
+  margin: 0 auto;
+  max-width: 540px;
+  font-size: 16px;
+  color: #8a7070;
+  line-height: 1.8;
+}
+.home-reveal-copy::after {
+  content: "";
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: Georgia, serif;
-  font-size: 15px;
-  color: #6f5656;
+  inset: 12px;
+  border-radius: 26px;
+  border: 1px solid transparent;
   pointer-events: none;
-  letter-spacing: .02em;
+  transition: border-color .25s ease, background .25s ease;
 }
-.home-reveal-knob {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fffdfb;
-  border: 1px solid rgba(125,95,85,.13);
-  box-shadow: 0 5px 12px rgba(80,55,45,.15);
-  font-size: 20px;
-  color: #7b5d5d;
-  transition: transform .05s linear;
+.home-reveal-copy:hover::after {
+  border-color: rgba(110,85,85,.10);
+  background: rgba(255,255,255,.035);
 }
 .home-weather-info {
-  min-height: 96px;
-  margin-top: 10px;
+  min-height: 105px;
+  margin: 24px auto 0;
+  max-width: 520px;
   display: grid;
   align-content: center;
-  gap: 4px;
+  gap: 5px;
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity .08s linear, transform .08s linear;
+  transform: translateX(-42px);
+  will-change: opacity, transform;
 }
-.home-weather-main { font-size: 21px; color: #4f3d3d; }
-.home-weather-sub { font-size: 14px; color: #786565; }
-.home-weather-note { font-size: 12px; color: #987e7e; margin-top: 3px; }
-.home-location-tools { margin-top: 15px; text-align: center; }
+.home-weather-main { font-size: 23px; color: #4f3d3d; }
+.home-weather-sub { font-size: 15px; color: #786565; }
+.home-weather-note { font-size: 12px; color: #987e7e; margin-top: 4px; }
+.home-reveal-copy[data-direction="right"] .home-weather-info {
+  transform: translateX(-42px);
+}
+.home-reveal-copy[data-direction="left"] .home-weather-info {
+  transform: translateX(42px);
+}
+.home-arrow {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(110,85,85,.13);
+  background: rgba(255,255,255,.48);
+  color: #725d5d;
+  font-family: Georgia, serif;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(80,55,45,.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform .15s ease, background .15s ease;
+}
+.home-arrow:hover {
+  transform: scale(1.05);
+  background: rgba(255,255,255,.68);
+}
+.home-arrow:active { transform: scale(.97); }
+.home-location-tools {
+  margin-top: 8px;
+  text-align: center;
+  position: relative;
+  z-index: 5;
+}
 .home-location-button {
   border: 0;
   background: transparent;
@@ -1206,11 +1207,13 @@ transform: translate(-50%, 0) scale(1);
 }
 .home-location-panel {
   display: none;
-  margin-top: 12px;
+  margin: 12px auto 0;
   padding: 14px;
+  width: min(340px, 100%);
   border-radius: 18px;
   background: rgba(255,255,255,.72);
   border: 1px solid rgba(120,90,70,.10);
+  box-shadow: 0 10px 24px rgba(80,55,45,.08);
 }
 .home-location-panel.open { display: block; }
 .home-location-row {
@@ -1240,12 +1243,18 @@ transform: translate(-50%, 0) scale(1);
   cursor: pointer;
 }
 @media (max-width: 600px) {
-  .home-scene-card { padding: 18px 15px 15px; }
-  .home-weather-main { font-size: 19px; }
-  .home-reveal-slider { display: none; }
-  .home-weather-info { opacity: 1; transform: none; }
+  .home-reveal-shell { display: block; }
+  .home-arrow { display: none; }
+  .home-reveal-copy {
+    min-height: 320px;
+    padding: 24px 14px 16px;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  .home-reveal-copy h1 { font-size: 34px; }
+  .home-reveal-copy > p { font-size: 15px; }
+  .home-weather-info { min-height: 100px; }
 }
-
 </style>
 
 </head>
@@ -1401,55 +1410,72 @@ transform: translate(-50%, 0) scale(1);
 
     <div class="home-content">
 
-      <h1>
-        Our Little Archive ♡
-      </h1>
+      <div class="home-reveal-shell" id="homeRevealShell">
 
-      <p>
-        A little place for us.
-        <br>
-        For everything we want to remember.
-      </p>
-
-      <div class="home-scene-card" id="homeSceneCard">
-        <div class="scene-label">for when you miss them</div>
+        <button
+          type="button"
+          class="home-arrow"
+          id="homeRevealPrev"
+          aria-label="Reveal from the right"
+        >
+          ‹
+        </button>
 
         <div
-          id="homeRevealSlider"
-          class="home-reveal-slider"
+          id="homeRevealCopy"
+          class="home-reveal-copy"
           role="slider"
           aria-valuemin="0"
           aria-valuemax="100"
           aria-valuenow="0"
           aria-label="Slide to see your love's local time and weather"
+          tabindex="0"
         >
-          <div id="homeRevealFill" class="home-reveal-fill"></div>
-          <div class="home-reveal-track-text">slide to see them ♡</div>
-          <div id="homeRevealKnob" class="home-reveal-knob">♡</div>
+
+          <h1>
+            Our Little Archive ♡
+          </h1>
+
+          <p>
+            A little place for us.
+            <br>
+            For everything we want to remember.
+          </p>
+
+          <div id="homeWeatherInfo" class="home-weather-info" aria-live="polite">
+            <div id="homeWeatherMain" class="home-weather-main">Their world is waiting ♡</div>
+            <div id="homeWeatherSub" class="home-weather-sub">Swipe to reveal their time and weather.</div>
+            <div id="homeWeatherNote" class="home-weather-note"></div>
+          </div>
+
         </div>
 
-        <div id="homeWeatherInfo" class="home-weather-info" aria-live="polite">
-          <div id="homeWeatherMain" class="home-weather-main">Their world is waiting ♡</div>
-          <div id="homeWeatherSub" class="home-weather-sub">Slide to reveal their time and weather.</div>
-          <div id="homeWeatherNote" class="home-weather-note"></div>
-        </div>
+        <button
+          type="button"
+          class="home-arrow"
+          id="homeRevealNext"
+          aria-label="Reveal from the left"
+        >
+          ›
+        </button>
 
-        <div class="home-location-tools">
-          <button type="button" id="homeLocationButton" class="home-location-button">📍 Choose my city</button>
-          <div id="homeLocationPanel" class="home-location-panel">
-            <div class="home-location-row">
-              <select id="homeLocationSelect" aria-label="Choose your city">
-                <option value="Tokyo">Tokyo</option>
-                <option value="Scotland">Scotland</option>
-                <option value="Singapore">Singapore</option>
-                <option value="Yangon">Yangon</option>
-                <option value="Kuala Lumpur">Kuala Lumpur</option>
-                <option value="Paris">Paris</option>
-                <option value="New York">NewYork</option>
-                <option value="Los Angeles">LosAngeles</option>
-              </select>
-              <button type="button" id="homeLocationSave" class="home-location-save">Save</button>
-            </div>
+      </div>
+
+      <div class="home-location-tools">
+        <button type="button" id="homeLocationButton" class="home-location-button">📍 Choose my city</button>
+        <div id="homeLocationPanel" class="home-location-panel">
+          <div class="home-location-row">
+            <select id="homeLocationSelect" aria-label="Choose your city">
+              <option value="Tokyo">Tokyo</option>
+              <option value="Scotland">Scotland</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Yangon">Yangon</option>
+              <option value="Kuala Lumpur">Kuala Lumpur</option>
+              <option value="Paris">Paris</option>
+              <option value="New York">NewYork</option>
+              <option value="Los Angeles">LosAngeles</option>
+            </select>
+            <button type="button" id="homeLocationSave" class="home-location-save">Save</button>
           </div>
         </div>
       </div>
@@ -2466,39 +2492,33 @@ function partnerName() {
   return document.body.dataset.person === "Kai" ? "Shiori" : "Kai";
 }
 
-function applyHomeReveal(progress) {
+function applyHomeReveal(progress, direction) {
   const home = document.getElementById("home");
-  const fill = document.getElementById("homeRevealFill");
-  const knob = document.getElementById("homeRevealKnob");
-  const slider = document.getElementById("homeRevealSlider");
+  const copy = document.getElementById("homeRevealCopy");
   const info = document.getElementById("homeWeatherInfo");
-  if (!home || !info) return;
+  if (!home || !copy || !info) return;
 
   const p = Math.max(0, Math.min(1, progress));
-  const mobile = window.matchMedia("(max-width: 600px)").matches;
-
-  if (slider && fill && knob) {
-    fill.style.width = (p * 100) + "%";
-    const travel = slider.clientWidth - knob.offsetWidth - 10;
-    knob.style.transform = `translateX(${p * Math.max(0, travel)}px)`;
-    slider.setAttribute("aria-valuenow", String(Math.round(p * 100)));
-  }
-
-  info.style.opacity = mobile ? 1 : Math.min(1, p * 1.35);
-  info.style.transform = mobile ? "none" : `translateY(${10 - p * 10}px)`;
+  const dir = direction || copy.dataset.direction || "right";
+  copy.dataset.direction = dir;
+  copy.setAttribute("aria-valuenow", String(Math.round(p * 100)));
 
   const state = window.partnerWeatherState;
+  const origin = dir === "left" ? 42 : -42;
+  const x = origin * (1 - p);
+  info.style.opacity = String(Math.min(1, p * 1.18));
+  info.style.transform = `translateX(${x}px) translateY(${10 - p * 10}px)`;
+
   if (state) {
-    const alpha = mobile ? 0.58 : (0.58 * p);
+    const alpha = 0.72 * p;
     home.style.setProperty("--scene-color", state.color);
     home.style.setProperty("--scene-top", state.topColor || state.color);
     home.style.setProperty("--scene-bottom", state.bottomColor || state.color);
     home.style.setProperty("--scene-alpha", String(alpha));
   } else {
-    home.style.setProperty("--scene-alpha", mobile ? "0.14" : String(0.12 * p));
+    home.style.setProperty("--scene-alpha", String(0.08 * p));
   }
 }
-
 
 async function loadMyChosenCity() {
   const person = document.body.dataset.person;
@@ -2620,64 +2640,92 @@ async function saveMyChosenCity(city) {
 }
 
 function initHomeRevealSlider() {
-  const slider = document.getElementById("homeRevealSlider");
-  const button = document.getElementById("homeLocationButton");
-  const panel = document.getElementById("homeLocationPanel");
+  const copy = document.getElementById("homeRevealCopy");
+  const prev = document.getElementById("homeRevealPrev");
+  const next = document.getElementById("homeRevealNext");
+  const locationButton = document.getElementById("homeLocationButton");
+  const locationPanel = document.getElementById("homeLocationPanel");
   const select = document.getElementById("homeLocationSelect");
   const save = document.getElementById("homeLocationSave");
-  if (!slider) return;
+  if (!copy) return;
 
-  if (window.matchMedia("(max-width: 600px)").matches) {
-    if (button && panel) {
-      button.addEventListener("click", function() { panel.classList.toggle("open"); });
-    }
-    if (save && select) {
-      save.addEventListener("click", function() { saveMyChosenCity(select.value); });
-    }
-    return;
-  }
-
+  let progress = 0;
   let dragging = false;
+  let startX = 0;
+  let startProgress = 0;
 
-  const progressFromEvent = (event) => {
-    const rect = slider.getBoundingClientRect();
-    return Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+  const setProgress = (value, direction) => {
+    progress = Math.max(0, Math.min(1, value));
+    applyHomeReveal(progress, direction);
   };
 
-  slider.addEventListener("pointerdown", function(event) {
-    dragging = true;
-    slider.classList.add("dragging");
-    slider.setPointerCapture(event.pointerId);
-    event.preventDefault();
-    applyHomeReveal(progressFromEvent(event));
-  });
-
-  slider.addEventListener("pointermove", function(event) {
-    if (!dragging) return;
-    event.preventDefault();
-    applyHomeReveal(progressFromEvent(event));
-  });
-
-  function finish(event) {
-    if (!dragging) return;
-    dragging = false;
-    slider.classList.remove("dragging");
-    if (event && slider.hasPointerCapture?.(event.pointerId)) {
-      try { slider.releasePointerCapture(event.pointerId); } catch (_) {}
-    }
-    if (event) applyHomeReveal(progressFromEvent(event));
+  // PC: arrows change the reveal in small steps.
+  if (prev) {
+    prev.addEventListener("click", function() {
+      setProgress(progress - 0.2, "left");
+    });
+  }
+  if (next) {
+    next.addEventListener("click", function() {
+      setProgress(progress + 0.2, "right");
+    });
   }
 
-  slider.addEventListener("pointerup", finish);
-  slider.addEventListener("pointercancel", function() {
-    dragging = false;
-    slider.classList.remove("dragging");
-    applyHomeReveal(0);
+  // On PC, clicking the text itself changes the reveal directionally.
+  copy.addEventListener("click", function(event) {
+    if (isMobile()) return;
+    const rect = copy.getBoundingClientRect();
+    const isRightSide = (event.clientX - rect.left) > (rect.width / 2);
+    setProgress(progress + (isRightSide ? 0.2 : -0.2), isRightSide ? "right" : "left");
   });
 
-  if (button && panel) {
-    button.addEventListener("click", function() {
-      panel.classList.toggle("open");
+  // Keyboard support on the text itself.
+  copy.addEventListener("keydown", function(event) {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setProgress(progress + 0.2, "right");
+    }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setProgress(progress - 0.2, "left");
+    }
+  });
+
+  // Mobile: the actual text block becomes the swipe area.
+  const mobileQuery = window.matchMedia("(max-width: 600px)");
+  const isMobile = () => mobileQuery.matches;
+
+  copy.addEventListener("pointerdown", function(event) {
+    if (!isMobile()) return;
+    dragging = true;
+    startX = event.clientX;
+    startProgress = progress;
+    copy.setPointerCapture?.(event.pointerId);
+    event.preventDefault();
+  });
+
+  copy.addEventListener("pointermove", function(event) {
+    if (!dragging || !isMobile()) return;
+    const distance = event.clientX - startX;
+    const direction = distance >= 0 ? "right" : "left";
+    const nextProgress = startProgress + distance / Math.max(180, copy.getBoundingClientRect().width);
+    setProgress(nextProgress, direction);
+  });
+
+  const finishSwipe = function(event) {
+    if (!dragging) return;
+    dragging = false;
+    if (event && copy.hasPointerCapture?.(event.pointerId)) {
+      try { copy.releasePointerCapture(event.pointerId); } catch (_) {}
+    }
+  };
+
+  copy.addEventListener("pointerup", finishSwipe);
+  copy.addEventListener("pointercancel", finishSwipe);
+
+  if (locationButton && locationPanel) {
+    locationButton.addEventListener("click", function() {
+      locationPanel.classList.toggle("open");
     });
   }
 
@@ -2686,8 +2734,9 @@ function initHomeRevealSlider() {
       saveMyChosenCity(select.value);
     });
   }
-}
 
+  setProgress(0, "right");
+}
 
 /* =========================
    Menu
