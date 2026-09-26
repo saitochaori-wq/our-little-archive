@@ -1076,6 +1076,176 @@ transform: translate(-50%, 0) scale(1);
     .archive-photo-picker-button:active {
       transform: translateY(1px);
     }
+
+
+/* =========================
+   Home — partner weather reveal
+========================= */
+.home {
+  position: relative;
+  overflow: hidden;
+  --scene-color: 255,255,255;
+  --scene-alpha: 0;
+  --scene-top: 255,255,255;
+  --scene-bottom: 255,255,255;
+}
+.home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(var(--scene-top), calc(var(--scene-alpha) * .84)), transparent 50%),
+    radial-gradient(circle at 84% 28%, rgba(var(--scene-color), calc(var(--scene-alpha) * .28)), transparent 48%),
+    linear-gradient(180deg, rgba(var(--scene-top), calc(var(--scene-alpha) * .34)), rgba(var(--scene-bottom), var(--scene-alpha)));
+  transition: background .18s linear;
+}
+.home-content {
+  position: relative;
+  z-index: 2;
+  width: min(560px, 100%);
+}
+.home h1 { position: relative; z-index: 2; }
+.home-scene-card {
+  position: relative;
+  margin: 26px auto 0;
+  width: min(420px, 100%);
+  padding: 22px 20px 18px;
+  border-radius: 26px;
+  background: rgba(255,255,255,.64);
+  border: 1px solid rgba(120,90,70,.10);
+  box-shadow: 0 12px 30px rgba(80,55,45,.10), inset 0 1px 0 rgba(255,255,255,.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+.scene-label {
+  font-size: 12px;
+  color: #8a7070;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.home-reveal-slider {
+  position: relative;
+  width: 100%;
+  height: 58px;
+  margin: 8px 0 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(125,95,85,.12);
+  box-shadow: inset 0 2px 6px rgba(90,60,50,.08);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+.home-reveal-slider.dragging { cursor: grabbing; }
+.home-reveal-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255,223,229,.80), rgba(205,221,238,.84));
+}
+.home-reveal-track-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, serif;
+  font-size: 15px;
+  color: #6f5656;
+  pointer-events: none;
+  letter-spacing: .02em;
+}
+.home-reveal-knob {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fffdfb;
+  border: 1px solid rgba(125,95,85,.13);
+  box-shadow: 0 5px 12px rgba(80,55,45,.15);
+  font-size: 20px;
+  color: #7b5d5d;
+  transition: transform .05s linear;
+}
+.home-weather-info {
+  min-height: 96px;
+  margin-top: 10px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .08s linear, transform .08s linear;
+}
+.home-weather-main { font-size: 21px; color: #4f3d3d; }
+.home-weather-sub { font-size: 14px; color: #786565; }
+.home-weather-note { font-size: 12px; color: #987e7e; margin-top: 3px; }
+.home-location-tools { margin-top: 15px; text-align: center; }
+.home-location-button {
+  border: 0;
+  background: transparent;
+  color: #8a7070;
+  font-family: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.home-location-panel {
+  display: none;
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(120,90,70,.10);
+}
+.home-location-panel.open { display: block; }
+.home-location-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.home-location-row select {
+  min-width: 190px;
+  max-width: 100%;
+  border: 1px solid rgba(120,90,70,.16);
+  border-radius: 12px;
+  padding: 9px 11px;
+  background: rgba(255,255,255,.88);
+  color: #5e4c4c;
+  font-family: inherit;
+}
+.home-location-save {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 14px;
+  background: #6b5757;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  .home-scene-card { padding: 18px 15px 15px; }
+  .home-weather-main { font-size: 19px; }
+  .home-reveal-slider { display: none; }
+  .home-weather-info { opacity: 1; transform: none; }
+}
+
 </style>
 
 </head>
@@ -1236,12 +1406,53 @@ transform: translate(-50%, 0) scale(1);
       </h1>
 
       <p>
-
         A little place for us.
         <br>
         For everything we want to remember.
-
       </p>
+
+      <div class="home-scene-card" id="homeSceneCard">
+        <div class="scene-label">for when you miss them</div>
+
+        <div
+          id="homeRevealSlider"
+          class="home-reveal-slider"
+          role="slider"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          aria-label="Slide to see your love's local time and weather"
+        >
+          <div id="homeRevealFill" class="home-reveal-fill"></div>
+          <div class="home-reveal-track-text">slide to see them ♡</div>
+          <div id="homeRevealKnob" class="home-reveal-knob">♡</div>
+        </div>
+
+        <div id="homeWeatherInfo" class="home-weather-info" aria-live="polite">
+          <div id="homeWeatherMain" class="home-weather-main">Their world is waiting ♡</div>
+          <div id="homeWeatherSub" class="home-weather-sub">Slide to reveal their time and weather.</div>
+          <div id="homeWeatherNote" class="home-weather-note"></div>
+        </div>
+
+        <div class="home-location-tools">
+          <button type="button" id="homeLocationButton" class="home-location-button">📍 Choose my city</button>
+          <div id="homeLocationPanel" class="home-location-panel">
+            <div class="home-location-row">
+              <select id="homeLocationSelect" aria-label="Choose your city">
+                <option value="Tokyo">Tokyo</option>
+                <option value="Scotland">Scotland</option>
+                <option value="Singapore">Singapore</option>
+                <option value="Yangon">Yangon</option>
+                <option value="Kuala Lumpur">Kuala Lumpur</option>
+                <option value="Paris">Paris</option>
+                <option value="New York">NewYork</option>
+                <option value="Los Angeles">LosAngeles</option>
+              </select>
+              <button type="button" id="homeLocationSave" class="home-location-save">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
 
@@ -1599,6 +1810,7 @@ import {
   addDoc,
   getDocs,
   getDoc,
+  setDoc,
   deleteDoc,
   doc,
   updateDoc,
@@ -1698,6 +1910,8 @@ function enterArchive(person) {
     .style.display = "none";
 
   document.body.dataset.person = person;
+  loadMyChosenCity();
+  loadPartnerWeather();
 
 }
 
@@ -2203,7 +2417,277 @@ window.addEventListener("DOMContentLoaded", function() {
   if (createButton) {
     createButton.addEventListener("click", createArchiveAlbum);
   }
+  initHomeRevealSlider();
 });
+
+
+
+/* =========================
+   Home — partner place, time & weather
+========================= */
+const PRESENCE_LOCATIONS = {
+  "Tokyo": { latitude: 35.6762, longitude: 139.6503 },
+  "Scotland": { latitude: 55.9533, longitude: -3.1883 },
+  "Singapore": { latitude: 1.3521, longitude: 103.8198 },
+  "Yangon": { latitude: 16.8409, longitude: 96.1735 },
+  "Kuala Lumpur": { latitude: 3.1390, longitude: 101.6869 },
+  "Paris": { latitude: 48.8566, longitude: 2.3522 },
+  "New York": { latitude: 40.7128, longitude: -74.0060 },
+  "Los Angeles": { latitude: 34.0522, longitude: -118.2437 },
+  /* legacy saved locations, kept readable for existing data */
+  "London": { latitude: 51.5072, longitude: -0.1276 },
+  "Osaka": { latitude: 34.6937, longitude: 135.5023 },
+  "Seoul": { latitude: 37.5665, longitude: 126.9780 },
+  "Sydney": { latitude: -33.8688, longitude: 151.2093 }
+};
+
+const WEATHER_INFO = [
+  { max: 0, icon: "☀️", label: "Clear", color: "255,205,120" },
+  { max: 3, icon: "🌤️", label: "Cloudy", color: "205,213,236" },
+  { max: 48, icon: "🌫️", label: "Foggy", color: "184,190,198" },
+  { max: 57, icon: "🌦️", label: "Drizzle", color: "175,201,220" },
+  { max: 67, icon: "🌧️", label: "Rain", color: "125,153,190" },
+  { max: 77, icon: "❄️", label: "Snow", color: "206,221,238" },
+  { max: 82, icon: "🌧️", label: "Showers", color: "112,144,184" },
+  { max: 86, icon: "🌨️", label: "Snow showers", color: "191,213,232" },
+  { max: 99, icon: "⛈️", label: "Storm", color: "110,102,147" }
+];
+
+function weatherDetails(code) {
+  return WEATHER_INFO.find(item => code <= item.max) || WEATHER_INFO[WEATHER_INFO.length - 1];
+}
+
+function localTimeFromApi(timeString) {
+  if (!timeString || !timeString.includes("T")) return "--:--";
+  return timeString.split("T")[1].slice(0, 5);
+}
+
+function partnerName() {
+  return document.body.dataset.person === "Kai" ? "Shiori" : "Kai";
+}
+
+function applyHomeReveal(progress) {
+  const home = document.getElementById("home");
+  const fill = document.getElementById("homeRevealFill");
+  const knob = document.getElementById("homeRevealKnob");
+  const slider = document.getElementById("homeRevealSlider");
+  const info = document.getElementById("homeWeatherInfo");
+  if (!home || !info) return;
+
+  const p = Math.max(0, Math.min(1, progress));
+  const mobile = window.matchMedia("(max-width: 600px)").matches;
+
+  if (slider && fill && knob) {
+    fill.style.width = (p * 100) + "%";
+    const travel = slider.clientWidth - knob.offsetWidth - 10;
+    knob.style.transform = `translateX(${p * Math.max(0, travel)}px)`;
+    slider.setAttribute("aria-valuenow", String(Math.round(p * 100)));
+  }
+
+  info.style.opacity = mobile ? 1 : Math.min(1, p * 1.35);
+  info.style.transform = mobile ? "none" : `translateY(${10 - p * 10}px)`;
+
+  const state = window.partnerWeatherState;
+  if (state) {
+    const alpha = mobile ? 0.58 : (0.58 * p);
+    home.style.setProperty("--scene-color", state.color);
+    home.style.setProperty("--scene-top", state.topColor || state.color);
+    home.style.setProperty("--scene-bottom", state.bottomColor || state.color);
+    home.style.setProperty("--scene-alpha", String(alpha));
+  } else {
+    home.style.setProperty("--scene-alpha", mobile ? "0.14" : String(0.12 * p));
+  }
+}
+
+
+async function loadMyChosenCity() {
+  const person = document.body.dataset.person;
+  const select = document.getElementById("homeLocationSelect");
+  if (!person || !select) return;
+  try {
+    const snap = await getDoc(doc(db, "presenceSettings", person));
+    if (snap.exists() && PRESENCE_LOCATIONS[snap.data().city]) {
+      select.value = snap.data().city;
+    }
+  } catch (error) {
+    console.error("Load my city error:", error);
+  }
+}
+
+async function loadPartnerWeather() {
+  const main = document.getElementById("homeWeatherMain");
+  const sub = document.getElementById("homeWeatherSub");
+  const note = document.getElementById("homeWeatherNote");
+  if (!main || !sub || !note) return;
+
+  const partner = partnerName();
+  try {
+    const snap = await getDoc(doc(db, "presenceSettings", partner));
+    if (!snap.exists()) {
+      main.textContent = `${partner}'s place is waiting ♡`;
+      sub.textContent = "They can choose a city from their Home screen.";
+      note.textContent = "Only the city you choose is shared.";
+      window.partnerWeatherState = null;
+      applyHomeReveal(0);
+      return;
+    }
+
+    const city = snap.data().city;
+    const loc = PRESENCE_LOCATIONS[city];
+    if (!loc) {
+      main.textContent = `${partner}'s place is waiting ♡`;
+      sub.textContent = "They can choose a city from their Home screen.";
+      note.textContent = "Only the city you choose is shared.";
+      return;
+    }
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weather_code,is_day&timezone=auto`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Weather request failed");
+    const weather = await response.json();
+    const current = weather.current || {};
+    const details = weatherDetails(Number(current.weather_code));
+    const isDay = Number(current.is_day) === 1;
+    const time = localTimeFromApi(current.time);
+    const tempNumber = Number(current.temperature_2m);
+    const temp = Number.isFinite(tempNumber) ? `${Math.round(tempNumber)}°C` : "--°C";
+    let color = details.color;
+    let topColor = details.color;
+    let bottomColor = details.color;
+
+    if (!isDay) {
+      color = "52,61,97";
+      topColor = "44,52,84";
+      bottomColor = "20,25,48";
+    } else if (details.label === "Clear") {
+      topColor = "255,220,156";
+      bottomColor = "250,236,205";
+    } else if (details.label === "Rain" || details.label === "Showers" || details.label === "Drizzle") {
+      topColor = "146,171,199";
+      bottomColor = "83,111,145";
+    } else if (details.label === "Snow" || details.label === "Snow showers") {
+      topColor = "228,238,248";
+      bottomColor = "191,211,229";
+    } else if (details.label === "Storm") {
+      topColor = "126,117,160";
+      bottomColor = "70,64,106";
+    } else if (details.label === "Foggy") {
+      topColor = "204,208,212";
+      bottomColor = "164,171,179";
+    } else {
+      topColor = "204,214,235";
+      bottomColor = "145,160,184";
+    }
+
+    window.partnerWeatherState = { city, color, topColor, bottomColor, isDay, icon: details.icon, label: details.label, time, temp };
+    main.textContent = `${details.icon} ${partner} · ${city}`;
+    sub.textContent = `${time} · ${details.label} · ${temp}`;
+    note.textContent = isDay ? "It’s daytime there ♡" : "It’s nighttime there ♡";
+    document.getElementById("home").style.setProperty("--scene-color", color);
+    applyHomeReveal(0);
+  } catch (error) {
+    console.error("Partner weather error:", error);
+    main.textContent = "The weather is hiding for a moment ♡";
+    sub.textContent = "Try again in a little while.";
+    note.textContent = "";
+    window.partnerWeatherState = null;
+    applyHomeReveal(0);
+  }
+}
+
+async function saveMyChosenCity(city) {
+  const person = document.body.dataset.person;
+  const loc = PRESENCE_LOCATIONS[city];
+  if (!person || !loc) return;
+
+  try {
+    await setDoc(doc(db, "presenceSettings", person), {
+      person,
+      city,
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      updatedAt: Date.now()
+    }, { merge: true });
+
+    const panel = document.getElementById("homeLocationPanel");
+    if (panel) panel.classList.remove("open");
+    await loadPartnerWeather();
+    alert("Your city was saved ♡");
+  } catch (error) {
+    console.error("Save city error:", error);
+    alert("Could not save your city ♡\n\n" + (error?.code || "unknown-error"));
+  }
+}
+
+function initHomeRevealSlider() {
+  const slider = document.getElementById("homeRevealSlider");
+  const button = document.getElementById("homeLocationButton");
+  const panel = document.getElementById("homeLocationPanel");
+  const select = document.getElementById("homeLocationSelect");
+  const save = document.getElementById("homeLocationSave");
+  if (!slider) return;
+
+  if (window.matchMedia("(max-width: 600px)").matches) {
+    if (button && panel) {
+      button.addEventListener("click", function() { panel.classList.toggle("open"); });
+    }
+    if (save && select) {
+      save.addEventListener("click", function() { saveMyChosenCity(select.value); });
+    }
+    return;
+  }
+
+  let dragging = false;
+
+  const progressFromEvent = (event) => {
+    const rect = slider.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+  };
+
+  slider.addEventListener("pointerdown", function(event) {
+    dragging = true;
+    slider.classList.add("dragging");
+    slider.setPointerCapture(event.pointerId);
+    event.preventDefault();
+    applyHomeReveal(progressFromEvent(event));
+  });
+
+  slider.addEventListener("pointermove", function(event) {
+    if (!dragging) return;
+    event.preventDefault();
+    applyHomeReveal(progressFromEvent(event));
+  });
+
+  function finish(event) {
+    if (!dragging) return;
+    dragging = false;
+    slider.classList.remove("dragging");
+    if (event && slider.hasPointerCapture?.(event.pointerId)) {
+      try { slider.releasePointerCapture(event.pointerId); } catch (_) {}
+    }
+    if (event) applyHomeReveal(progressFromEvent(event));
+  }
+
+  slider.addEventListener("pointerup", finish);
+  slider.addEventListener("pointercancel", function() {
+    dragging = false;
+    slider.classList.remove("dragging");
+    applyHomeReveal(0);
+  });
+
+  if (button && panel) {
+    button.addEventListener("click", function() {
+      panel.classList.toggle("open");
+    });
+  }
+
+  if (save && select) {
+    save.addEventListener("click", function() {
+      saveMyChosenCity(select.value);
+    });
+  }
+}
+
 
 /* =========================
    Menu
@@ -2256,6 +2740,9 @@ window.goHome = function() {
 
   const home = document.getElementById("home");
   home.style.display = "flex";
+  applyHomeReveal(0);
+  loadMyChosenCity();
+  loadPartnerWeather();
   closeMenu();
 };
 
