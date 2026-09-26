@@ -2653,30 +2653,59 @@ function initHomeRevealSlider() {
   let dragging = false;
   let startX = 0;
   let startProgress = 0;
+  let animationFrame = null;
 
   const setProgress = (value, direction) => {
     progress = Math.max(0, Math.min(1, value));
     applyHomeReveal(progress, direction);
   };
 
-  // PC: arrows change the reveal in small steps.
+  // PC: one click triggers a smooth animation all the way to the next side.
+  const animateTo = (target, direction) => {
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+
+    const start = progress;
+    const end = Math.max(0, Math.min(1, target));
+    const duration = 850;
+    const startTime = performance.now();
+
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+    const step = (now) => {
+      const raw = Math.min(1, (now - startTime) / duration);
+      const eased = ease(raw);
+      progress = start + (end - start) * eased;
+      applyHomeReveal(progress, direction);
+
+      if (raw < 1) {
+        animationFrame = requestAnimationFrame(step);
+      } else {
+        animationFrame = null;
+      }
+    };
+
+    animationFrame = requestAnimationFrame(step);
+  };
+
   if (prev) {
     prev.addEventListener("click", function() {
-      setProgress(progress - 0.2, "left");
+      if (isMobile()) return;
+      animateTo(0, "left");
     });
   }
   if (next) {
     next.addEventListener("click", function() {
-      setProgress(progress + 0.2, "right");
+      if (isMobile()) return;
+      animateTo(1, "right");
     });
   }
 
-  // On PC, clicking the text itself changes the reveal directionally.
+  // On PC, clicking the text itself smoothly reveals from the clicked side.
   copy.addEventListener("click", function(event) {
     if (isMobile()) return;
     const rect = copy.getBoundingClientRect();
     const isRightSide = (event.clientX - rect.left) > (rect.width / 2);
-    setProgress(progress + (isRightSide ? 0.2 : -0.2), isRightSide ? "right" : "left");
+    animateTo(isRightSide ? 1 : 0, isRightSide ? "right" : "left");
   });
 
   // Keyboard support on the text itself.
