@@ -2762,10 +2762,14 @@ function initHomeRevealSlider() {
     const threshold = 24;
 
     if (Math.abs(distance) >= threshold) {
-      const direction = distance >= 0 ? "right" : "left";
-      // When hidden, either swipe reveals; when visible, either swipe hides.
-      // The swipe direction controls the side of the transition.
-      const target = startProgress < 0.5 ? 1 : 0;
+      const opening = startProgress < 0.5;
+      // Hidden: either swipe reveals from the side you swipe toward.
+      // Visible: right swipe (left → right) hides to the left;
+      //          left swipe (right → left) hides to the right.
+      const direction = opening
+        ? (distance >= 0 ? "right" : "left")
+        : (distance >= 0 ? "left" : "right");
+      const target = opening ? 1 : 0;
       animateTo(target, direction);
     } else {
       animateTo(startProgress, distance >= 0 ? "right" : "left");
