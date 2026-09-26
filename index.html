@@ -1018,7 +1018,7 @@ transform: translate(-50%, 0) scale(1);
   >
 
     <h2>
-      💌 Inbox
+      💌 Love Mail
     </h2>
 
     <p class="page-description">
@@ -1034,7 +1034,7 @@ transform: translate(-50%, 0) scale(1);
 
 
 <div class="mail-inbox-header">
-  <h3>📥 Inbox</h3>
+  <h3>📥 Love Mail</h3>
   <p>Messages from your love will appear here ♡</p>
 </div>
 
@@ -1373,15 +1373,15 @@ function randomFutureTime() {
 
 window.openLoveSend = async function() {
 
+  const from = document.body.dataset.person;
+  const to = from === "Kai" ? "Shiori" : "Kai"; // お互いに送れる
+
   const message =
     prompt(from === "Shiori" ? "Write a little love for him ♡" : "Write a little love for her ♡");
 
   if (!message || message.trim() === "") {
     return;
   }
-
-  const from = document.body.dataset.person;
-  const to = from === "Kai" ? "Shiori" : "Kai"; // お互いに送れる
 
   try {
 
@@ -1811,7 +1811,7 @@ window.loadBook = async function() {
                   <br><br>
 
                   <button
-                    onclick="deleteLoveFromBook('${love.loveId}')"
+                    onclick="deleteLoveFromBook('${love.id}')"
                     class="book-delete-button"
                   >
                     🗑️ Remove
@@ -1932,58 +1932,6 @@ bookMessages.onmouseup = function(e) {
   }
 
 };
-  /* =========================
-   Remove Love from My Love Diary
-========================= */
-
-
-  window.deleteLoveFromBook = async function(loveId) {
-
-  try {
-
-    const snapshot =
-      await getDocs(
-        collection(db, "savedLove")
-      );
-
-    let savedDocId = null;
-
-    snapshot.forEach(function(doc) {
-
-      const item = doc.data();
-
-      if (
-        item.loveId === loveId &&
-        item.person === document.body.dataset.person
-      ) {
-        savedDocId = doc.id;
-      }
-
-    });
-
-    if (!savedDocId) {
-      alert("This little love could not be found ♡");
-      return;
-    }
-
-    await deleteDoc(
-      doc(db, "savedLove", savedDocId)
-    );
-
-    loadBook();
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Something went wrong while removing this love."
-    );
-
-  }
-
-};
-
 /* =========================
    New Inbox → Diary → Trash system
 ========================= */
@@ -2088,25 +2036,41 @@ window.loadTrash = async function() {
   }
 };
 
-window.deleteLoveFromBook = async function(loveId) {
+window.deleteLoveFromBook = async function(savedDocId) {
   const person = document.body.dataset.person;
+
   try {
     const snapshot = await getDocs(collection(db, "savedLove"));
     let found = null;
+
     snapshot.forEach(function(snap) {
-      const m = snap.data();
-      if (snap.id === loveId || (m.loveId === loveId && m.person === person)) {
-        if (!found) found = { id: snap.id, ...m };
+      if (snap.id === savedDocId) {
+        const item = snap.data();
+        if (item.person === person) {
+          found = { id: snap.id, ...item };
+        }
       }
     });
-    if (!found) return;
+
+    if (!found) {
+      alert("This little love could not be found ♡");
+      return;
+    }
+
     await addDoc(collection(db, "trashLove"), {
-      ...found,
+      person: found.person,
+      loveId: found.loveId,
+      from: found.from,
+      message: found.message,
+      date: found.date,
+      savedAt: found.savedAt,
+      source: found.source || "savedLove",
       originalSavedLoveId: found.id,
       deletedAt: new Date().toISOString()
     });
+
     await deleteDoc(doc(db, "savedLove", found.id));
-    loadBook();
+    await loadBook();
   } catch (error) {
     console.error(error);
     alert("Something went wrong while moving this love to Trash.");
