@@ -997,6 +997,15 @@ transform: translate(-50%, 0) scale(1);
 .request-god-access #requestGodButton{width:72px;height:72px;min-height:0;margin:0;padding:10px;border-radius:50%;font-size:11px;line-height:1.15;letter-spacing:0;color:#fff;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.28);box-shadow:0 6px 0 rgba(0,0,0,.35),0 10px 22px rgba(0,0,0,.22),inset 0 2px 0 rgba(255,255,255,.12);}
 .request-god-access #requestGodButton:hover{transform:translateY(-2px);background:rgba(0,0,0,.68);color:#fff;}
 .request-god-access #requestGodButton:active{transform:translateY(5px);background:rgba(0,0,0,.8);}
+
+    .archive-photo-picker-button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+    .archive-photo-picker-button:active {
+      transform: translateY(1px);
+    }
 </style>
 
 </head>
@@ -1655,12 +1664,9 @@ async function loadArchiveAlbums() {
         const addButton = remaining > 0
           ? `
             <div class="archive-album-add-row">
-              <label class="archive-upload-button" for="${inputId}">📷 Add three best photos</label>
-              <input id="${inputId}" type="file" accept="image/*,.heic,.heif" multiple style="display:none;" data-album-id="${album.id}">
-              <div class="archive-dropzone" data-drop-album-id="${album.id}" tabindex="0">
-                <span>Choose photos from your phone, or paste an image</span>
-              </div>
-              <div class="archive-mobile-hint">On your phone, tap the photo button to choose from your photos ♡</div>
+              <button type="button" class="archive-upload-button archive-photo-picker-button" data-photo-picker="${album.id}">📷 Choose from Photos</button>
+              <input id="${inputId}" type="file" accept="image/*" multiple hidden data-album-id="${album.id}">
+              <div class="archive-mobile-hint">Choose up to ${remaining} photo${remaining === 1 ? "" : "s"} from your phone ♡</div>
             </div>
           `
           : `
@@ -1690,64 +1696,25 @@ async function loadArchiveAlbums() {
       unsortedGallery.innerHTML = "";
     }
 
+    document.querySelectorAll('[data-photo-picker]').forEach(function(button) {
+      button.addEventListener("click", function(event) {
+        event.preventDefault();
+        const albumId = event.currentTarget.dataset.photoPicker;
+        const input = document.querySelector('input[data-album-id="' + albumId + '"]');
+        if (input) input.click();
+      });
+    });
+
     document.querySelectorAll('input[data-album-id]').forEach(function(input) {
       input.addEventListener("change", function(event) {
-        uploadArchiveAlbumPhotos(event.target.dataset.albumId, event.target.files);
+        const files = event.target && event.target.files ? Array.from(event.target.files) : [];
+        if (!files.length) return;
+        uploadArchiveAlbumPhotos(event.target.dataset.albumId, files);
         event.target.value = "";
       });
     });
 
-    document.querySelectorAll('[data-drop-album-id]').forEach(function(zone) {
-      const setActive = function(active) {
-        zone.classList.toggle("drag-over", active);
-      };
-
-      zone.addEventListener("dragenter", function(event) {
-        event.preventDefault();
-        setActive(true);
-      });
-
-      zone.addEventListener("dragover", function(event) {
-        event.preventDefault();
-        setActive(true);
-      });
-
-      zone.addEventListener("dragleave", function(event) {
-        event.preventDefault();
-        if (!zone.contains(event.relatedTarget)) setActive(false);
-      });
-
-      zone.addEventListener("drop", function(event) {
-        event.preventDefault();
-        setActive(false);
-        const files = event.dataTransfer && event.dataTransfer.files;
-        uploadArchiveAlbumPhotos(zone.dataset.dropAlbumId, files);
-      });
-
-      zone.addEventListener("click", function() {
-        zone.focus();
-        const input = document.querySelector('input[data-album-id="' + zone.dataset.dropAlbumId + '"]');
-        if (input) input.click();
-      });
-
-      zone.addEventListener("paste", function(event) {
-        const items = event.clipboardData ? Array.from(event.clipboardData.items || []) : [];
-        const imageFiles = items
-          .filter(function(item) { return item.type && item.type.startsWith("image/"); })
-          .map(function(item) { return item.getAsFile(); })
-          .filter(Boolean);
-
-        if (!imageFiles.length) return;
-        event.preventDefault();
-        uploadArchiveAlbumPhotos(zone.dataset.dropAlbumId, imageFiles);
-      });
-    });
-
     document.querySelectorAll('.archive-album-card').forEach(function(card) {
-      card.addEventListener("click", function() {
-        card.focus();
-      });
-
       card.addEventListener("paste", function(event) {
         const items = event.clipboardData ? Array.from(event.clipboardData.items || []) : [];
         const imageFiles = items
@@ -1827,45 +1794,85 @@ async function createArchiveAlbum() {
 window.createArchiveAlbum = createArchiveAlbum;
 
 
-function compressArchivePhoto(file, maxDimension = 1200, quality = 0.6) {
+function compressArchivePhoto(file, maxDimension = 1200, quality = 0.58) {
   return new Promise(function(resolve, reject) {
+    if (!file || typeof file !== "object") {
+      reject(new Error("No photo was selected."));
+      return;
+    }
+
     const reader = new FileReader();
+    reader.onload = async function() {
+      const source = reader.result;
+      try {
+        let width = 0;
+        let height = 0;
+        let drawSource = null;
+        let revokeUrl = null;
 
-    reader.onload = function() {
-      const image = new Image();
-      image.onload = function() {
-        try {
-          const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
-          const width = Math.max(1, Math.round(image.naturalWidth * scale));
-          const height = Math.max(1, Math.round(image.naturalHeight * scale));
-          const canvas = document.createElement("canvas");
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d", { alpha: false });
-          ctx.drawImage(image, 0, 0, width, height);
-
-          let dataUrl = canvas.toDataURL("image/jpeg", quality);
-          if (dataUrl.length > 260000) dataUrl = canvas.toDataURL("image/jpeg", 0.42);
-          if (dataUrl.length > 260000) {
-            reject(new Error("This photo is too large after compression. Please choose a smaller photo."));
-            return;
+        if (typeof createImageBitmap === "function") {
+          try {
+            const bitmap = await createImageBitmap(file);
+            width = bitmap.width;
+            height = bitmap.height;
+            drawSource = bitmap;
+          } catch (bitmapError) {
+            // Fall back to an Image element below.
           }
-
-          resolve(dataUrl);
-        } catch (error) {
-          reject(error);
         }
-      };
-      image.onerror = function() {
-        reject(new Error("This image could not be read."));
-      };
-      image.src = reader.result;
-    };
 
-    reader.onerror = function() {
-      reject(new Error("This image could not be loaded."));
-    };
+        if (!drawSource) {
+          const image = new Image();
+          image.decoding = "async";
+          image.src = source;
+          await new Promise(function(res, rej) {
+            image.onload = res;
+            image.onerror = function() { rej(new Error("This photo format is not supported by the browser.")); };
+          });
+          width = image.naturalWidth;
+          height = image.naturalHeight;
+          drawSource = image;
+        }
 
+        if (!width || !height) throw new Error("This photo could not be read.");
+
+        const scale = Math.min(1, maxDimension / Math.max(width, height));
+        const outWidth = Math.max(1, Math.round(width * scale));
+        const outHeight = Math.max(1, Math.round(height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = outWidth;
+        canvas.height = outHeight;
+        const ctx = canvas.getContext("2d", { alpha: false });
+        if (!ctx) throw new Error("Your browser could not prepare this photo.");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, outWidth, outHeight);
+        ctx.drawImage(drawSource, 0, 0, outWidth, outHeight);
+
+        let dataUrl = canvas.toDataURL("image/jpeg", quality);
+        for (const q of [0.48, 0.38, 0.30]) {
+          if (dataUrl.length <= 220000) break;
+          dataUrl = canvas.toDataURL("image/jpeg", q);
+        }
+
+        if (dataUrl.length > 220000) {
+          canvas.width = Math.max(1, Math.round(outWidth * 0.78));
+          canvas.height = Math.max(1, Math.round(outHeight * 0.78));
+          ctx.drawImage(drawSource, 0, 0, canvas.width, canvas.height);
+          dataUrl = canvas.toDataURL("image/jpeg", 0.34);
+        }
+
+        if (dataUrl.length > 230000) {
+          throw new Error("This photo is still too large. Please choose another photo.");
+        }
+
+        if (drawSource && typeof drawSource.close === "function") drawSource.close();
+        if (revokeUrl) URL.revokeObjectURL(revokeUrl);
+        resolve(dataUrl);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    reader.onerror = function() { reject(new Error("This photo could not be loaded.")); };
     reader.readAsDataURL(file);
   });
 }
@@ -1897,7 +1904,7 @@ async function uploadArchiveAlbumPhotos(albumId, files) {
     });
 
     if (!imageFiles.length) {
-      alert("写真を選んでね ♡");
+      alert("Please choose a photo from your Photos ♡");
       return;
     }
 
