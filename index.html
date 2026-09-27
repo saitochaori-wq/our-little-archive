@@ -5230,9 +5230,44 @@ window.restoreLoveFromTrash = async function(trashId) {
     snapshot.forEach(function(snap) { if (snap.id === trashId) found = { id: snap.id, ...snap.data() }; });
     if (!found) return;
     const { id, originalSavedLoveId, deletedAt, ...data } = found;
-    await addDoc(collection(db, "savedLove"), data);
+
+    // If this came from Inbox, restore the original futureLove message
+    // instead of putting it into My Love Diary.
+    if (data.source === "futureLove" && data.loveId) {
+      const originalRef = doc(db, "futureLove", data.loveId);
+      const originalSnap = await getDoc(originalRef);
+
+      if (originalSnap.exists()) {
+        await updateDoc(originalRef, {
+          trashed: false,
+          savedToDiary: false
+        });
+      } else {
+        // Fallback for older trash entries whose original message no longer exists.
+        await addDoc(collection(db, "futureLove"), {
+          from: data.from || "",
+          to: document.body.dataset.person,
+          text: data.message === "🎵 Spotify song" ? "" : (data.message || ""),
+          spotifyUrl: data.spotifyUrl || "",
+          spotifyEmbedUrl: data.spotifyEmbedUrl || "",
+          createdAt: data.date ? new Date(data.date).getTime() : Date.now(),
+          deliverAt: Date.now(),
+          delivered: true,
+          cancelled: false,
+          savedToDiary: false,
+          trashed: false,
+          kind: data.spotifyUrl || data.spotifyEmbedUrl ? "music" : "love"
+        });
+      }
+    } else {
+      // If this came from My Love Diary, restore it to the Diary as before.
+      await addDoc(collection(db, "savedLove"), data);
+    }
+
     await deleteDoc(doc(db, "trashLove", trashId));
-    loadTrash();
+    await loadTrash();
+    await loadInbox();
+    await loadBook();
   } catch (error) {
     console.error(error);
     alert("Could not restore this love.");
