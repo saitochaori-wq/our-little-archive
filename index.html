@@ -5708,6 +5708,9 @@ window.loadInbox = async function() {
             <div class="love-text">🎵 A song for you</div>
             <div class="love-meta">from ${escapeHtml(m.from || "")} · ${new Date(m.createdAt || Date.now()).toLocaleDateString("en-GB")}</div>
             ${embedUrl ? `<div class="spotify-card"><iframe src="${embedUrl}" title="Spotify player" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe><a class="book-save-button spotify-fallback" href="${safeSpotifyUrl}" target="_blank" rel="noopener">🎵 Open in Spotify</a></div>` : `<a class="book-save-button spotify-fallback" href="${safeSpotifyUrl}" target="_blank" rel="noopener">🎵 Open in Spotify</a>`}
+          <div class="message-actions">
+            <button class="book-delete-button" onclick="deleteReceivedMusic('${m.id}')">🗑️ Remove</button>
+          </div>
           </article>`;
       }
 
@@ -5723,6 +5726,28 @@ window.loadInbox = async function() {
   } catch (error) {
     console.error(error);
     inbox.innerHTML = '<div class="coming-soon">Could not open your inbox ♡</div>';
+  }
+};
+
+window.deleteReceivedMusic = async function(messageId) {
+  const person = document.body.dataset.person;
+  if (!confirm("Remove this song from your inbox? ♡")) return;
+  try {
+    const messageRef = doc(db, "futureLove", messageId);
+    const snapshot = await getDoc(messageRef);
+    if (!snapshot.exists()) { alert("This song could not be found ♡"); return; }
+    const message = snapshot.data();
+    if (message.to !== person || message.kind !== "music" || !message.delivered) { alert("This song cannot be removed here ♡"); return; }
+    await addDoc(collection(db, "trashLove"), {
+      person: person, loveId: messageId, from: message.from || "",
+      message: "🎵 Spotify song", spotifyUrl: message.spotifyUrl || "",
+      spotifyEmbedUrl: message.spotifyEmbedUrl || "", deletedAt: new Date().toISOString(), source: "futureLove"
+    });
+    await updateDoc(messageRef, { trashed: true });
+    await loadInbox();
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong while removing this song ♡");
   }
 };
 
