@@ -4652,8 +4652,16 @@ window.showPage = function(pageId) {
 
 function randomFutureTime() {
   const oneDay = 24 * 60 * 60 * 1000;
-  const threeMonths = 90 * 24 * 60 * 60 * 1000;
-  return Date.now() + Math.floor(oneDay + Math.random() * (threeMonths - oneDay));
+  const fourteenDays = 14 * oneDay;
+  const threeMonths = 90 * oneDay;
+
+  // 70% chance: 1–14 days
+  // 30% chance: 15–90 days
+  if (Math.random() < 0.7) {
+    return Date.now() + Math.floor(oneDay + Math.random() * (fourteenDays - oneDay));
+  }
+
+  return Date.now() + Math.floor((15 * oneDay) + Math.random() * (threeMonths - (15 * oneDay)));
 }
 
 /* =========================
@@ -4760,7 +4768,7 @@ window.openLoveMusicSend = async function() {
       spotifyUrl: cleanUrl,
       spotifyEmbedUrl: embedUrl,
       createdAt: sentAt,
-      deliverAt: sentAt,
+      deliverAt: randomFutureTime(),
       delivered: false,
       cancelled: false,
       savedToDiary: false,
@@ -4768,7 +4776,7 @@ window.openLoveMusicSend = async function() {
       kind: "music"
     });
 
-    alert("Your song has been sent ♡\nIt will arrive right away.");
+    alert("Your song has been sent ♡\nIt will arrive sometime in the future.");
     // Check immediately too, so a test send is picked up without waiting for the interval.
     await checkFutureLove();
   } catch (error) {
